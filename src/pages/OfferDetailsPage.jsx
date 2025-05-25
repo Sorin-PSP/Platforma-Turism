@@ -1,0 +1,188 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { getOfferById } from '../services/offerService';
+import { isUserLoggedIn } from '../services/userService';
+import AuthModal from '../components/AuthModal';
+import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaStar, FaArrowLeft } from 'react-icons/fa';
+
+const OfferDetailsPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [offer, setOffer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isAuthenticated = isUserLoggedIn();
+
+  useEffect(() => {
+    const fetchOffer = async () => {
+      try {
+        const offerData = getOfferById(id);
+        if (offerData) {
+          setOffer(offerData);
+          
+          // Dacă utilizatorul nu este autentificat, afișăm modalul
+          if (!isAuthenticated) {
+            setIsModalOpen(true);
+          }
+        } else {
+          setError('Oferta nu a fost găsită');
+        }
+      } catch (err) {
+        setError('A apărut o eroare la încărcarea ofertei');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffer();
+  }, [id, isAuthenticated]);
+
+  const handleAuthSuccess = () => {
+    setIsModalOpen(false);
+    // Reîncărcăm pagina pentru a reflecta starea de autentificare
+    window.location.reload();
+  };
+
+  if (loading) {
+    return (
+      <div className="container-custom py-12">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !offer) {
+    return (
+      <div className="container-custom py-12">
+        <div className="bg-red-100 p-4 rounded-md">
+          <h2 className="text-xl font-semibold text-red-700 mb-2">Eroare</h2>
+          <p className="text-red-600">{error || 'Oferta nu a fost găsită'}</p>
+          <Link to="/" className="inline-flex items-center mt-4 text-primary hover:underline">
+            <FaArrowLeft className="mr-2" /> Înapoi la pagina principală
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-custom py-8">
+      <Link to="/" className="inline-flex items-center mb-6 text-primary hover:underline">
+        <FaArrowLeft className="mr-2" /> Înapoi la oferte
+      </Link>
+
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="relative h-64 md:h-96">
+          <img 
+            src={offer.image} 
+            alt={offer.title} 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+            <div className="flex items-center mb-2">
+              <span className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                {offer.category}
+              </span>
+              <div className="ml-auto flex items-center bg-white bg-opacity-90 px-3 py-1 rounded-full">
+                <FaStar className="text-yellow-400 mr-1" />
+                <span className="font-semibold">{offer.rating}</span>
+              </div>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">{offer.title}</h1>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex items-center text-gray-600">
+              <FaMapMarkerAlt className="mr-2 text-primary" />
+              <span>{offer.location}</span>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <FaCalendarAlt className="mr-2 text-primary" />
+              <span>{offer.duration}</span>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <FaUsers className="mr-2 text-primary" />
+              <span>Grup de {offer.groupSize} persoane</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="md:w-2/3">
+              <h2 className="text-xl font-semibold mb-4">Descriere</h2>
+              <p className="text-gray-700 mb-6">{offer.description}</p>
+
+              <h2 className="text-xl font-semibold mb-4">Ce include</h2>
+              <ul className="list-disc pl-5 mb-6 text-gray-700">
+                {offer.includes.map((item, index) => (
+                  <li key={index} className="mb-2">{item}</li>
+                ))}
+              </ul>
+
+              <h2 className="text-xl font-semibold mb-4">Program</h2>
+              <div className="space-y-4">
+                {offer.itinerary.map((day, index) => (
+                  <div key={index} className="border-l-4 border-primary pl-4">
+                    <h3 className="font-semibold text-lg">Ziua {index + 1}</h3>
+                    <p className="text-gray-700">{day}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:w-1/3">
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-primary">{offer.price} €</span>
+                  <span className="text-gray-500 ml-2">/ persoană</span>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="font-semibold mb-2">Agenție de turism</h3>
+                  <div className="flex items-center">
+                    <img 
+                      src={offer.agency.logo} 
+                      alt={offer.agency.name} 
+                      className="w-10 h-10 object-contain mr-3"
+                    />
+                    <div>
+                      <p className="font-medium">{offer.agency.name}</p>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <FaStar className="text-yellow-400 mr-1" />
+                        <span>{offer.agency.rating} ({offer.agency.reviewCount} recenzii)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  className="w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
+                  onClick={() => !isAuthenticated && setIsModalOpen(true)}
+                >
+                  Contactează agenția
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <AuthModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          navigate('/');
+        }}
+        onAuthSuccess={handleAuthSuccess}
+        customMessage="Oferte valabile numai pentru clienții TravelDeal"
+      />
+    </div>
+  );
+};
+
+export default OfferDetailsPage;

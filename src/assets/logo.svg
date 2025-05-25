@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+  <!-- Globe -->
+  <circle cx="20" cy="20" r="18" fill="white" stroke="#0891b2" stroke-width="2"/>
+  
+  <!-- Latitude/Longitude lines -->
+  <ellipse cx="20" cy="20" rx="14" ry="18" stroke="#0891b2" stroke-opacity="0.3" stroke-width="1"/>
+  <ellipse cx="20" cy="20" rx="18" ry="14" stroke="#0891b2" stroke-opacity="0.3" stroke-width="1"/>
+  
+  <!-- Redesigned Airplane - larger and more clearly an airplane -->
+  <path d="M32 15.5L22 20L32 24.5L29 26L19 23L12 26L9 24.5L15 20L9 15.5L12 14L19 17L29 14L32 15.5Z" fill="#0891b2"/>
+  
+  <!-- Cockpit detail to make it more recognizable -->
+  <circle cx="22" cy="20" r="1.2" fill="#0891b2" stroke="white" stroke-width="0.4"/>
+</svg>
