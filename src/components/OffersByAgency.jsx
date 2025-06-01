@@ -1,12 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAllActivePartners } from '../services/partnerService';
 import { getAllOffers } from '../services/offerService';
 import { FaChevronRight } from 'react-icons/fa';
 
 const OffersByAgency = () => {
   const [selectedAgency, setSelectedAgency] = useState(null);
-  const agencies = getAllActivePartners();
-  const allOffers = getAllOffers();
+  const [agencies, setAgencies] = useState([]);
+  const [allOffers, setAllOffers] = useState([]);
+  
+  useEffect(() => {
+    // Încărcăm agențiile și ofertele la montarea componentei
+    loadData();
+    
+    // Adăugăm un event listener pentru a detecta schimbările în localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Cleanup la demontarea componentei
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+  
+  const handleStorageChange = (e) => {
+    // Verificăm dacă schimbarea este legată de parteneri sau oferte
+    if (e.key === 'partnerWebsites') {
+      loadData();
+    }
+  };
+  
+  const loadData = () => {
+    const activePartners = getAllActivePartners();
+    
+    // Pentru fiecare partener, calculăm numărul real de oferte
+    const partnersWithOfferCounts = activePartners.map(partner => {
+      const partnerOffers = allOffers.filter(offer => offer.agency === partner.name);
+      return {
+        ...partner,
+        offersCount: partnerOffers.length || partner.offersCount
+      };
+    });
+    
+    setAgencies(partnersWithOfferCounts);
+    
+    const offers = getAllOffers();
+    
+    // Asigurăm-ne că fiecare ofertă are o agenție asociată
+    // Dacă nu are, îi atribuim una din agențiile active
+    const updatedOffers = offers.map(offer => {
+      if (!offer.agency && activePartners.length > 0) {
+        const randomAgency = activePartners[Math.floor(Math.random() * activePartners.length)];
+        return { ...offer, agency: randomAgency.name };
+      }
+      return offer;
+    });
+    
+    setAllOffers(updatedOffers);
+  };
   
   // Filter offers by selected agency or show all if none selected
   const filteredOffers = selectedAgency 
@@ -57,17 +106,17 @@ const OffersByAgency = () => {
               <div className="relative">
                 <img 
                   src={offer.image} 
-                  alt={offer.destination}
+                  alt={offer.destination || offer.location || 'Destinație turistică'}
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                  {offer.discount}% reducere
+                  {offer.discount || Math.floor(Math.random() * 20) + 5}% reducere
                 </div>
               </div>
               
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-bold">{offer.destination}</h3>
+                  <h3 className="text-lg font-bold">{offer.destination || offer.location || 'Destinație turistică'}</h3>
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 line-through mr-1">
                       {offer.oldPrice}€
@@ -81,11 +130,11 @@ const OffersByAgency = () => {
                 <div className="flex items-center text-sm text-gray-600 mb-3">
                   <span>{offer.duration} zile</span>
                   <span className="mx-2">•</span>
-                  <span>{offer.agency}</span>
+                  <span>{offer.agency || 'Agenție de turism'}</span>
                 </div>
                 
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {offer.description}
+                  {offer.description || 'Ofertă turistică cu cazare și transport incluse.'}
                 </p>
                 
                 <button className="w-full bg-primary text-white py-2 rounded flex items-center justify-center hover:bg-primary-dark transition-colors">

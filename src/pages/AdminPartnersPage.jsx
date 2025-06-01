@@ -7,7 +7,8 @@ import {
   FaToggleOn, 
   FaToggleOff,
   FaExclamationTriangle,
-  FaCheck
+  FaCheck,
+  FaSync
 } from 'react-icons/fa';
 import { 
   getAllPartners, 
@@ -16,6 +17,7 @@ import {
   deletePartner, 
   togglePartnerStatus 
 } from '../services/partnerService';
+import { manualFetchOffers, getOffersByAgency } from '../services/offerService';
 
 const AdminPartnersPage = () => {
   const [partners, setPartners] = useState([]);
@@ -28,14 +30,40 @@ const AdminPartnersPage = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadPartners();
+    
+    // Adăugăm un event listener pentru a detecta schimbările în localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Cleanup la demontarea componentei
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
+
+  const handleStorageChange = (e) => {
+    // Verificăm dacă schimbarea este legată de parteneri
+    if (e.key === 'partnerWebsites') {
+      loadPartners();
+    }
+  };
 
   const loadPartners = () => {
     const partnersList = getAllPartners();
-    setPartners(partnersList);
+    
+    // Pentru fiecare partener, verificăm numărul real de oferte
+    const partnersWithOfferCounts = partnersList.map(partner => {
+      const partnerOffers = getOffersByAgency(partner.name);
+      return {
+        ...partner,
+        offersCount: partnerOffers.length
+      };
+    });
+    
+    setPartners(partnersWithOfferCounts);
   };
 
   const handleInputChange = (e) => {
@@ -115,7 +143,7 @@ const AdminPartnersPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -128,8 +156,11 @@ const AdminPartnersPage = () => {
       
       if (updatedPartner) {
         showNotification('success', 'Partenerul a fost actualizat cu succes');
-        loadPartners();
         setShowModal(false);
+        
+        // Actualizăm ofertele pentru a reflecta schimbările
+        await refreshOffers();
+        loadPartners();
       } else {
         showNotification('error', 'A apărut o eroare la actualizarea partenerului');
       }
@@ -137,9 +168,35 @@ const AdminPartnersPage = () => {
       // Add new partner
       const newPartner = addPartner(formData);
       
-      showNotification('success', 'Partenerul a fost adăugat cu succes');
-      loadPartners();
-      setShowModal(false);
+      if (newPartner) {
+        showNotification('success', 'Partenerul a fost adăugat cu succes');
+        setShowModal(false);
+        
+        // Actualizăm ofertele pentru a reflecta noul partener
+        await refreshOffers();
+        loadPartners();
+      } else {
+        showNotification('error', 'A apărut o eroare la adăugarea partenerului');
+      }
+    }
+  };
+
+  const refreshOffers = async () => {
+    setIsLoading(true);
+    try {
+      const result = await manualFetchOffers();
+      if (result.success) {
+        showNotification('success', `${result.message} S-au adăugat ${result.newOffersCount} oferte noi.`);
+        // Reîncărcăm partenerii pentru a actualiza numărul de oferte
+        loadPartners();
+      } else {
+        showNotification('error', 'A apărut o eroare la actualizarea ofertelor');
+      }
+    } catch (error) {
+      showNotification('error', 'A apărut o eroare la actualizarea ofertelor');
+      console.error('Error refreshing offers:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -159,13 +216,23 @@ const AdminPartnersPage = () => {
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">Website-uri Partenere</h1>
           <p className="text-sm md:text-base text-gray-600">Gestionați website-urile partenere pentru preluarea ofertelor</p>
         </div>
-        <button
-          onClick={handleAddPartner}
-          className="bg-primary text-white px-3 py-1.5 md:px-4 md:py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center text-sm md:text-base"
-        >
-          <FaPlus className="mr-1 md:mr-2" />
-          Adaugă Partener
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={refreshOffers}
+            disabled={isLoading}
+            className={`bg-blue-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-md hover:bg-blue-600 transition-colors flex items-center text-sm md:text-base ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            <FaSync className={`mr-1 md:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Actualizează Oferte
+          </button>
+          <button
+            onClick={handleAddPartner}
+            className="bg-primary text-white px-3 py-1.5 md:px-4 md:py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center text-sm md:text-base"
+          >
+            <FaPlus className="mr-1 md:mr-2" />
+            Adaugă Partener
+          </button>
+        </div>
       </div>
 
       {notification && (

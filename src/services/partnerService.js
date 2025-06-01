@@ -1,7 +1,13 @@
 import { partnerApiEndpoints } from './offerService';
 
-// In-memory storage for partner websites
-let partnerWebsites = partnerApiEndpoints.map((endpoint, index) => {
+// Verificăm dacă există date salvate în localStorage
+const getSavedPartners = () => {
+  const savedPartners = localStorage.getItem('partnerWebsites');
+  return savedPartners ? JSON.parse(savedPartners) : null;
+};
+
+// Inițializăm partnerWebsites din localStorage sau cu valorile implicite
+let partnerWebsites = getSavedPartners() || partnerApiEndpoints.map((endpoint, index) => {
   const domain = endpoint.split('//')[1].split('/')[0];
   const name = domain.split('.')[1];
   
@@ -17,11 +23,24 @@ let partnerWebsites = partnerApiEndpoints.map((endpoint, index) => {
   };
 });
 
+// Funcție pentru a salva partenerii în localStorage
+const savePartnersToStorage = () => {
+  localStorage.setItem('partnerWebsites', JSON.stringify(partnerWebsites));
+  
+  // Declanșăm un eveniment de storage pentru a notifica alte componente
+  window.dispatchEvent(new Event('storage'));
+};
+
 /**
  * Gets all partner websites
  * @returns {Array} - List of partner websites
  */
 export const getAllPartners = () => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
   return [...partnerWebsites];
 };
 
@@ -30,6 +49,11 @@ export const getAllPartners = () => {
  * @returns {Array} - List of active partner websites
  */
 export const getAllActivePartners = () => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
   return [...partnerWebsites].filter(partner => partner.active);
 };
 
@@ -48,6 +72,12 @@ export const getPartnerById = (id) => {
  * @returns {object} - The added partner
  */
 export const addPartner = (partnerData) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
+
   const newId = partnerWebsites.length > 0 
     ? Math.max(...partnerWebsites.map(p => p.id)) + 1 
     : 1;
@@ -63,6 +93,9 @@ export const addPartner = (partnerData) => {
   
   partnerWebsites.push(newPartner);
   
+  // Salvăm în localStorage
+  savePartnersToStorage();
+  
   // Update the partner API endpoints in the offer service
   // In a real implementation, this would update the actual service configuration
   console.log(`Added new partner: ${newPartner.name} (${newPartner.apiEndpoint})`);
@@ -77,6 +110,12 @@ export const addPartner = (partnerData) => {
  * @returns {object|null} - The updated partner or null if not found
  */
 export const updatePartner = (id, partnerData) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
+
   const index = partnerWebsites.findIndex(partner => partner.id === parseInt(id));
   
   if (index === -1) {
@@ -91,6 +130,9 @@ export const updatePartner = (id, partnerData) => {
   
   partnerWebsites[index] = updatedPartner;
   
+  // Salvăm în localStorage
+  savePartnersToStorage();
+  
   // Update the partner API endpoints in the offer service
   // In a real implementation, this would update the actual service configuration
   console.log(`Updated partner: ${updatedPartner.name} (${updatedPartner.apiEndpoint})`);
@@ -104,6 +146,12 @@ export const updatePartner = (id, partnerData) => {
  * @returns {boolean} - Whether the deletion was successful
  */
 export const deletePartner = (id) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
+
   const index = partnerWebsites.findIndex(partner => partner.id === parseInt(id));
   
   if (index === -1) {
@@ -112,6 +160,9 @@ export const deletePartner = (id) => {
   
   const deletedPartner = partnerWebsites[index];
   partnerWebsites.splice(index, 1);
+  
+  // Salvăm în localStorage
+  savePartnersToStorage();
   
   // Update the partner API endpoints in the offer service
   // In a real implementation, this would update the actual service configuration
@@ -126,6 +177,12 @@ export const deletePartner = (id) => {
  * @returns {object|null} - The updated partner or null if not found
  */
 export const togglePartnerStatus = (id) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
+
   const index = partnerWebsites.findIndex(partner => partner.id === parseInt(id));
   
   if (index === -1) {
@@ -133,6 +190,9 @@ export const togglePartnerStatus = (id) => {
   }
   
   partnerWebsites[index].active = !partnerWebsites[index].active;
+  
+  // Salvăm în localStorage
+  savePartnersToStorage();
   
   // Update the partner API endpoints in the offer service
   // In a real implementation, this would update the actual service configuration

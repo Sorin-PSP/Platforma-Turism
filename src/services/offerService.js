@@ -216,11 +216,97 @@ const offers = [
   }
 ];
 
+// Funcție pentru a genera oferte pentru un partener
+const generateOffersForPartner = (partner) => {
+  const destinations = [
+    'Paris, Franța', 'Roma, Italia', 'Londra, UK', 'Barcelona, Spania',
+    'Amsterdam, Olanda', 'Praga, Cehia', 'Viena, Austria', 'Berlin, Germania',
+    'Atena, Grecia', 'Istanbul, Turcia', 'Lisabona, Portugalia', 'Budapesta, Ungaria'
+  ];
+  
+  const images = [
+    'https://images.pexels.com/photos/161901/paris-sunset-france-monument-161901.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1797158/pexels-photo-1797158.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+  ];
+  
+  // Adăugăm 2-4 oferte pentru partener
+  const numOffers = Math.floor(Math.random() * 3) + 2;
+  const newOffers = [];
+  
+  for (let i = 0; i < numOffers; i++) {
+    const price = Math.floor(Math.random() * 500) + 300;
+    const discount = Math.floor(Math.random() * 20) + 5;
+    const oldPrice = Math.floor(price * (1 + discount / 100));
+    const duration = Math.floor(Math.random() * 7) + 3;
+    
+    const randomDestIndex = Math.floor(Math.random() * destinations.length);
+    const randomImgIndex = Math.floor(Math.random() * images.length);
+    
+    const newOffer = {
+      id: offers.length > 0 ? Math.max(...offers.map(o => o.id)) + 1 + i : 1 + i,
+      destination: destinations[randomDestIndex],
+      image: images[randomImgIndex],
+      price: price,
+      oldPrice: oldPrice,
+      discount: discount,
+      duration: duration,
+      description: `Descoperă frumusețea orașului ${destinations[randomDestIndex].split(',')[0]} cu acest pachet special de la ${partner.name}. Include cazare, transport și ghid local.`,
+      agency: partner.name,
+      departureDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString().split('T')[0],
+      returnDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (30 + duration)).toISOString().split('T')[0],
+      transport: 'Avion',
+      meals: 'Mic dejun',
+      accommodation: 'Hotel 4*',
+      featured: Math.random() > 0.7 // 30% șansă să fie featured
+    };
+    
+    newOffers.push(newOffer);
+  }
+  
+  return newOffers;
+};
+
+// Verificăm dacă există oferte pentru un partener
+const hasOffersForPartner = (partnerName) => {
+  return offers.some(offer => offer.agency === partnerName);
+};
+
+// Adăugăm un event listener pentru a actualiza ofertele când se schimbă partenerii
+window.addEventListener('storage', (e) => {
+  // Verificăm dacă schimbarea este legată de parteneri
+  if (e.key === 'partnerWebsites') {
+    updateOffersForPartners();
+  }
+});
+
+// Funcție pentru a actualiza ofertele pentru toți partenerii
+const updateOffersForPartners = () => {
+  const savedPartners = localStorage.getItem('partnerWebsites');
+  if (savedPartners) {
+    const partners = JSON.parse(savedPartners);
+    
+    // Verificăm dacă există parteneri care nu au oferte asociate
+    partners.forEach(partner => {
+      if (!hasOffersForPartner(partner.name) && partner.active) {
+        const newOffers = generateOffersForPartner(partner);
+        offers.push(...newOffers);
+      }
+    });
+  }
+};
+
+// Inițializăm ofertele pentru partenerii existenți
+updateOffersForPartners();
+
 /**
  * Gets all offers
  * @returns {Array} - List of all offers
  */
 export const getAllOffers = () => {
+  // Asigurăm-ne că avem oferte pentru toți partenerii activi
+  updateOffersForPartners();
   return [...offers];
 };
 
@@ -354,7 +440,7 @@ export const getNextUpdateTime = () => {
 
 /**
  * Manually fetches offers from partner websites
- * @returns {Promise<Array>} - Promise resolving to a list of new offers
+ * @returns {Promise<Object>} - Promise resolving to a result object
  */
 export const manualFetchOffers = async () => {
   // Simulate fetching offers from partner websites
@@ -363,10 +449,81 @@ export const manualFetchOffers = async () => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Return a success message (in a real app, this would return new offers)
+  // Forțăm actualizarea ofertelor pentru toți partenerii
+  const savedPartners = localStorage.getItem('partnerWebsites');
+  let newOffersCount = 0;
+  
+  if (savedPartners) {
+    const partners = JSON.parse(savedPartners);
+    
+    // Generăm oferte noi pentru toți partenerii activi
+    partners.forEach(partner => {
+      if (partner.active) {
+        // Verificăm dacă partenerul are deja oferte
+        const existingOffers = offers.filter(offer => offer.agency === partner.name);
+        
+        // Dacă nu are oferte sau are mai puține decât ar trebui, generăm noi oferte
+        if (existingOffers.length < partner.offersCount) {
+          const numNewOffers = Math.min(3, partner.offersCount - existingOffers.length);
+          const newOffers = [];
+          
+          for (let i = 0; i < numNewOffers; i++) {
+            const destinations = [
+              'Paris, Franța', 'Roma, Italia', 'Londra, UK', 'Barcelona, Spania',
+              'Amsterdam, Olanda', 'Praga, Cehia', 'Viena, Austria', 'Berlin, Germania',
+              'Atena, Grecia', 'Istanbul, Turcia', 'Lisabona, Portugalia', 'Budapesta, Ungaria'
+            ];
+            
+            const images = [
+              'https://images.pexels.com/photos/161901/paris-sunset-france-monument-161901.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+              'https://images.pexels.com/photos/1797158/pexels-photo-1797158.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+              'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+              'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+            ];
+            
+            const price = Math.floor(Math.random() * 500) + 300;
+            const discount = Math.floor(Math.random() * 20) + 5;
+            const oldPrice = Math.floor(price * (1 + discount / 100));
+            const duration = Math.floor(Math.random() * 7) + 3;
+            
+            const randomDestIndex = Math.floor(Math.random() * destinations.length);
+            const randomImgIndex = Math.floor(Math.random() * images.length);
+            
+            const newOffer = {
+              id: offers.length > 0 ? Math.max(...offers.map(o => o.id)) + 1 + i : 1 + i,
+              destination: destinations[randomDestIndex],
+              image: images[randomImgIndex],
+              price: price,
+              oldPrice: oldPrice,
+              discount: discount,
+              duration: duration,
+              description: `Descoperă frumusețea orașului ${destinations[randomDestIndex].split(',')[0]} cu acest pachet special de la ${partner.name}. Include cazare, transport și ghid local.`,
+              agency: partner.name,
+              departureDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString().split('T')[0],
+              returnDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (30 + duration)).toISOString().split('T')[0],
+              transport: 'Avion',
+              meals: 'Mic dejun',
+              accommodation: 'Hotel 4*',
+              featured: Math.random() > 0.7 // 30% șansă să fie featured
+            };
+            
+            newOffers.push(newOffer);
+          }
+          
+          offers.push(...newOffers);
+          newOffersCount += newOffers.length;
+        }
+      }
+    });
+  }
+  
+  // Declanșăm un eveniment de storage pentru a notifica alte componente
+  window.dispatchEvent(new Event('storage'));
+  
+  // Return a success message
   return {
     success: true,
     message: 'Ofertele au fost actualizate cu succes!',
-    newOffersCount: Math.floor(Math.random() * 10) + 1 // Random number of new offers
+    newOffersCount: newOffersCount
   };
 };

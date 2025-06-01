@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAllActivePartners } from '../services/partnerService';
 
 const AgenciesList = () => {
-  // Get all active partners from the service
-  const agencies = getAllActivePartners();
+  const [agencies, setAgencies] = useState([]);
+  
+  useEffect(() => {
+    // Încărcăm agențiile la montarea componentei
+    loadAgencies();
+    
+    // Adăugăm un event listener pentru a detecta schimbările în localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Cleanup la demontarea componentei
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+  
+  const handleStorageChange = (e) => {
+    // Verificăm dacă schimbarea este legată de parteneri
+    if (e.key === 'partnerWebsites') {
+      loadAgencies();
+    }
+  };
+  
+  const loadAgencies = () => {
+    // Get all active partners from the service
+    const activePartners = getAllActivePartners();
+    setAgencies(activePartners);
+  };
   
   return (
     <section className="py-8 md:py-12">
@@ -25,6 +50,11 @@ const AgenciesList = () => {
               <p className="text-xs md:text-sm text-gray-600">{agency.offersCount} oferte</p>
             </div>
           ))}
+          {agencies.length === 0 && (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-600">Nu există agenții partenere active momentan.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
