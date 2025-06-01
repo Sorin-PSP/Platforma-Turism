@@ -7,6 +7,7 @@ import AgenciesList from '../components/AgenciesList'
 import Testimonials from '../components/Testimonials'
 import Newsletter from '../components/Newsletter'
 import OfferUpdateStatus from '../components/OfferUpdateStatus'
+import OffersByAgency from '../components/OffersByAgency'
 import { getAllOffers } from '../services/offerService'
 
 const HomePage = () => {
@@ -18,6 +19,7 @@ const HomePage = () => {
       <SearchBar />
       <OffersList offers={offers} />
       <PopularDestinations />
+      <OffersByAgency />
       <AgenciesList />
       <Testimonials />
       <Newsletter />

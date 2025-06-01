@@ -40,7 +40,7 @@ const AdminDashboardPage = () => {
 
     try {
       const updatedOffers = await manualFetchOffers();
-      setOffers(updatedOffers);
+      setOffers(getAllOffers()); // Refresh offers from service
       setUpdateMessage({ type: 'success', text: 'Ofertele au fost actualizate cu succes!' });
     } catch (error) {
       console.error('Error updating offers:', error);
@@ -58,16 +58,21 @@ const AdminDashboardPage = () => {
   const activePartners = partners.filter(p => p.active).length;
   const totalOffers = offers.length;
 
-  // Group offers by location
+  // Group offers by location - with null check to prevent split error
   const offersByLocation = offers.reduce((acc, offer) => {
-    const location = offer.location.split(',')[0].trim();
-    acc[location] = (acc[location] || 0) + 1;
+    // Check if offer.location exists before trying to split it
+    if (offer && offer.location) {
+      const location = offer.location.split(',')[0].trim();
+      acc[location] = (acc[location] || 0) + 1;
+    }
     return acc;
   }, {});
 
-  // Group offers by agency
+  // Group offers by agency - with null check to prevent errors
   const offersByAgency = offers.reduce((acc, offer) => {
-    acc[offer.agency] = (acc[offer.agency] || 0) + 1;
+    if (offer && offer.agency) {
+      acc[offer.agency] = (acc[offer.agency] || 0) + 1;
+    }
     return acc;
   }, {});
 

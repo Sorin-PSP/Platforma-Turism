@@ -12,7 +12,8 @@ let partnerWebsites = partnerApiEndpoints.map((endpoint, index) => {
     apiEndpoint: endpoint,
     active: true,
     lastFetch: new Date().toISOString(),
-    offersCount: Math.floor(Math.random() * 50) + 10
+    offersCount: Math.floor(Math.random() * 50) + 10,
+    logo: `https://via.placeholder.com/150x50?text=${name.charAt(0).toUpperCase() + name.slice(1)}`
   };
 });
 
@@ -22,6 +23,14 @@ let partnerWebsites = partnerApiEndpoints.map((endpoint, index) => {
  */
 export const getAllPartners = () => {
   return [...partnerWebsites];
+};
+
+/**
+ * Gets all active partner websites for frontend display
+ * @returns {Array} - List of active partner websites
+ */
+export const getAllActivePartners = () => {
+  return [...partnerWebsites].filter(partner => partner.active);
 };
 
 /**
@@ -48,7 +57,8 @@ export const addPartner = (partnerData) => {
     ...partnerData,
     active: true,
     lastFetch: new Date().toISOString(),
-    offersCount: 0
+    offersCount: Math.floor(Math.random() * 30) + 5, // Random number of offers for demo
+    logo: `https://via.placeholder.com/150x50?text=${partnerData.name.replace(/\s+/g, '')}`
   };
   
   partnerWebsites.push(newPartner);
@@ -75,7 +85,8 @@ export const updatePartner = (id, partnerData) => {
   
   const updatedPartner = {
     ...partnerWebsites[index],
-    ...partnerData
+    ...partnerData,
+    logo: `https://via.placeholder.com/150x50?text=${partnerData.name.replace(/\s+/g, '')}`
   };
   
   partnerWebsites[index] = updatedPartner;
