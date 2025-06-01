@@ -6,6 +6,8 @@ const UserRegistration = ({ onSuccess }) => {
     firstName: '',
     lastName: '',
     email: '',
+    desiredDestination: '',
+    desiredDepartureDate: '',
     offerFrequency: 'weekly_one',
     password: '',
     confirmPassword: ''
@@ -84,6 +86,8 @@ const UserRegistration = ({ onSuccess }) => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        desiredDestination: formData.desiredDestination,
+        desiredDepartureDate: formData.desiredDepartureDate,
         offerFrequency: formData.offerFrequency,
         password: formData.password
       });
@@ -95,6 +99,8 @@ const UserRegistration = ({ onSuccess }) => {
           firstName: '',
           lastName: '',
           email: '',
+          desiredDestination: '',
+          desiredDepartureDate: '',
           offerFrequency: 'weekly_one',
           password: '',
           confirmPassword: ''
@@ -121,73 +127,105 @@ const UserRegistration = ({ onSuccess }) => {
   };
   
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
-      <h2 className="text-2xl font-bold text-primary mb-6">Creează cont nou</h2>
+    <div className="bg-white rounded-lg w-full">
+      <h2 className="text-lg font-bold text-primary mb-2">Creează cont nou</h2>
       
       {message.text && (
-        <div className={`mb-4 p-3 rounded ${
+        <div className={`mb-2 p-1.5 rounded text-xs ${
           message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
           {message.text}
         </div>
       )}
       
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <form onSubmit={handleSubmit} className="text-xs">
+        <div className="grid grid-cols-2 gap-2 mb-2">
           <div>
-            <label htmlFor="firstName" className="block text-gray-700 mb-1">Nume</label>
+            <label htmlFor="firstName" className="block text-gray-700 mb-0.5">Nume</label>
             <input
               type="text"
               id="firstName"
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary ${
                 errors.firstName ? 'border-red-500' : 'border-gray-300'
               }`}
             />
             {errors.firstName && (
-              <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+              <p className="text-red-500 text-xs mt-0.5">{errors.firstName}</p>
             )}
           </div>
           
           <div>
-            <label htmlFor="lastName" className="block text-gray-700 mb-1">Prenume</label>
+            <label htmlFor="lastName" className="block text-gray-700 mb-0.5">Prenume</label>
             <input
               type="text"
               id="lastName"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+              className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary ${
                 errors.lastName ? 'border-red-500' : 'border-gray-300'
               }`}
             />
             {errors.lastName && (
-              <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              <p className="text-red-500 text-xs mt-0.5">{errors.lastName}</p>
             )}
           </div>
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 mb-1">Email</label>
+        <div className="mb-2">
+          <label htmlFor="email" className="block text-gray-700 mb-0.5">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+            className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>
           )}
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="offerFrequency" className="block text-gray-700 mb-1">
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label htmlFor="desiredDestination" className="block text-gray-700 mb-0.5">
+              Destinația dorită
+            </label>
+            <input
+              type="text"
+              id="desiredDestination"
+              name="desiredDestination"
+              value={formData.desiredDestination}
+              onChange={handleChange}
+              placeholder="Ex: Grecia, Turcia..."
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="desiredDepartureDate" className="block text-gray-700 mb-0.5">
+              Data plecării
+            </label>
+            <input
+              type="date"
+              id="desiredDepartureDate"
+              name="desiredDepartureDate"
+              value={formData.desiredDepartureDate}
+              onChange={handleChange}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
+        
+        <div className="mb-2">
+          <label htmlFor="offerFrequency" className="block text-gray-700 mb-0.5">
             Frecvența ofertelor
           </label>
           <select
@@ -195,7 +233,7 @@ const UserRegistration = ({ onSuccess }) => {
             name="offerFrequency"
             value={formData.offerFrequency}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
           >
             {frequencyOptions.map(option => (
               <option key={option.value} value={option.value}>
@@ -205,44 +243,46 @@ const UserRegistration = ({ onSuccess }) => {
           </select>
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700 mb-1">Parolă</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.password ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-          )}
-        </div>
-        
-        <div className="mb-6">
-          <label htmlFor="confirmPassword" className="block text-gray-700 mb-1">Confirmă parola</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
-          )}
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label htmlFor="password" className="block text-gray-700 mb-0.5">Parolă</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary ${
+                errors.password ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-0.5">{errors.password}</p>
+            )}
+          </div>
+          
+          <div>
+            <label htmlFor="confirmPassword" className="block text-gray-700 mb-0.5">Confirmă parola</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary ${
+                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-0.5">{errors.confirmPassword}</p>
+            )}
+          </div>
         </div>
         
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors ${
+          className={`w-full bg-primary text-white py-1 px-4 rounded-md hover:bg-primary-dark transition-colors mt-2 ${
             isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
           }`}
         >

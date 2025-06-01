@@ -44,6 +44,14 @@ const Header = () => {
                 Acasă
               </Link>
               <Link
+                to="/last-minute"
+                className={`text-gray-700 hover:text-primary ${
+                  isActive('/last-minute') ? 'font-semibold text-primary' : ''
+                }`}
+              >
+                Last Minute
+              </Link>
+              <Link
                 to="/despre"
                 className={`text-gray-700 hover:text-primary ${
                   isActive('/despre') ? 'font-semibold text-primary' : ''
@@ -76,6 +84,15 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Acasă
+              </Link>
+              <Link
+                to="/last-minute"
+                className={`text-gray-700 hover:text-primary ${
+                  isActive('/last-minute') ? 'font-semibold text-primary' : ''
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Last Minute
               </Link>
               <Link
                 to="/despre"

@@ -16,24 +16,24 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, customMessage }) => {
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 md:mx-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 overflow-y-auto">
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-4">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
         >
-          <FaTimes size={20} />
+          <FaTimes size={18} />
         </button>
         
         {customMessage && (
-          <div className="bg-primary bg-opacity-10 p-4 text-primary text-center font-medium border-b border-primary border-opacity-20">
+          <div className="bg-primary bg-opacity-10 p-2 text-primary text-center text-sm font-medium border-b border-primary border-opacity-20">
             {customMessage}
           </div>
         )}
         
         <div className="flex border-b border-gray-200">
           <button
-            className={`flex-1 py-3 font-medium text-center ${
+            className={`flex-1 py-2 font-medium text-center text-sm ${
               activeTab === 'login'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-500 hover:text-gray-700'
@@ -43,7 +43,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, customMessage }) => {
             Autentificare
           </button>
           <button
-            className={`flex-1 py-3 font-medium text-center ${
+            className={`flex-1 py-2 font-medium text-center text-sm ${
               activeTab === 'register'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-500 hover:text-gray-700'
@@ -54,7 +54,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, customMessage }) => {
           </button>
         </div>
         
-        <div className="p-6">
+        <div className="p-3 max-h-[80vh] overflow-y-auto">
           {activeTab === 'login' ? (
             <UserLogin 
               onSuccess={handleAuthSuccess} 
