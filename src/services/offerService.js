@@ -25,7 +25,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 4*',
-    featured: true
+    featured: true,
+    isNew: true,
+    isLastMinute: false,
+    createdAt: new Date().toISOString()
   },
   {
     id: 2,
@@ -42,7 +45,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Demipensiune',
     accommodation: 'Hotel Boutique',
-    featured: true
+    featured: true,
+    isNew: false,
+    isLastMinute: true,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 zile în urmă
   },
   {
     id: 3,
@@ -59,7 +65,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 3*',
-    featured: false
+    featured: false,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() // 15 zile în urmă
   },
   {
     id: 4,
@@ -76,7 +85,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 4*',
-    featured: true
+    featured: true,
+    isNew: true,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2 zile în urmă
   },
   {
     id: 5,
@@ -93,7 +105,10 @@ const offers = [
     transport: 'Avion',
     meals: 'All inclusive',
     accommodation: 'Resort 5*',
-    featured: false
+    featured: false,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString() // 20 zile în urmă
   },
   {
     id: 6,
@@ -110,7 +125,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 4*',
-    featured: true
+    featured: true,
+    isNew: false,
+    isLastMinute: true,
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() // 10 zile în urmă
   },
   {
     id: 7,
@@ -127,7 +145,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Demipensiune',
     accommodation: 'Vilă privată',
-    featured: false
+    featured: false,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString() // 25 zile în urmă
   },
   {
     id: 8,
@@ -144,7 +165,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 3*',
-    featured: false
+    featured: false,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString() // 18 zile în urmă
   },
   {
     id: 9,
@@ -161,7 +185,10 @@ const offers = [
     transport: 'Avion',
     meals: 'All inclusive',
     accommodation: 'Bungalow pe apă',
-    featured: true
+    featured: true,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString() // 12 zile în urmă
   },
   {
     id: 10,
@@ -178,7 +205,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 4*',
-    featured: false
+    featured: false,
+    isNew: false,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() // 30 zile în urmă
   },
   {
     id: 11,
@@ -195,7 +225,10 @@ const offers = [
     transport: 'Avion',
     meals: 'Demipensiune',
     accommodation: 'Hotel 5*',
-    featured: true
+    featured: true,
+    isNew: false,
+    isLastMinute: true,
+    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() // 8 zile în urmă
   },
   {
     id: 12,
@@ -212,9 +245,31 @@ const offers = [
     transport: 'Avion',
     meals: 'Mic dejun',
     accommodation: 'Hotel 4*',
-    featured: false
+    featured: false,
+    isNew: true,
+    isLastMinute: false,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 zile în urmă
   }
 ];
+
+// Verificăm dacă există oferte salvate în localStorage
+const loadOffersFromStorage = () => {
+  const savedOffers = localStorage.getItem('tourismOffers');
+  if (savedOffers) {
+    const parsedOffers = JSON.parse(savedOffers);
+    // Înlocuim array-ul de oferte cu cel din localStorage
+    offers.length = 0;
+    offers.push(...parsedOffers);
+  }
+};
+
+// Salvăm ofertele în localStorage
+const saveOffersToStorage = () => {
+  localStorage.setItem('tourismOffers', JSON.stringify(offers));
+};
+
+// Încărcăm ofertele la inițializare
+loadOffersFromStorage();
 
 // Funcție pentru a genera oferte pentru un partener
 const generateOffersForPartner = (partner) => {
@@ -244,6 +299,19 @@ const generateOffersForPartner = (partner) => {
     const randomDestIndex = Math.floor(Math.random() * destinations.length);
     const randomImgIndex = Math.floor(Math.random() * images.length);
     
+    // Calculăm data de plecare (între 7 și 60 de zile în viitor)
+    const daysToAdd = Math.floor(Math.random() * 53) + 7;
+    const departureDate = new Date();
+    departureDate.setDate(departureDate.getDate() + daysToAdd);
+    
+    // Calculăm data de întoarcere
+    const returnDate = new Date(departureDate);
+    returnDate.setDate(returnDate.getDate() + duration);
+    
+    // Determinăm dacă oferta este nouă sau last minute
+    const isNew = Math.random() > 0.7; // 30% șansă să fie nouă
+    const isLastMinute = !isNew && daysToAdd < 14; // Last minute dacă pleacă în mai puțin de 14 zile
+    
     const newOffer = {
       id: offers.length > 0 ? Math.max(...offers.map(o => o.id)) + 1 + i : 1 + i,
       destination: destinations[randomDestIndex],
@@ -254,12 +322,15 @@ const generateOffersForPartner = (partner) => {
       duration: duration,
       description: `Descoperă frumusețea orașului ${destinations[randomDestIndex].split(',')[0]} cu acest pachet special de la ${partner.name}. Include cazare, transport și ghid local.`,
       agency: partner.name,
-      departureDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString().split('T')[0],
-      returnDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (30 + duration)).toISOString().split('T')[0],
+      departureDate: departureDate.toISOString().split('T')[0],
+      returnDate: returnDate.toISOString().split('T')[0],
       transport: 'Avion',
       meals: 'Mic dejun',
       accommodation: 'Hotel 4*',
-      featured: Math.random() > 0.7 // 30% șansă să fie featured
+      featured: Math.random() > 0.7, // 30% șansă să fie featured
+      isNew: isNew,
+      isLastMinute: isLastMinute,
+      createdAt: new Date().toISOString()
     };
     
     newOffers.push(newOffer);
@@ -292,6 +363,9 @@ const updateOffersForPartners = () => {
       if (!hasOffersForPartner(partner.name) && partner.active) {
         const newOffers = generateOffersForPartner(partner);
         offers.push(...newOffers);
+        
+        // Salvăm ofertele actualizate în localStorage
+        saveOffersToStorage();
       }
     });
   }
@@ -316,6 +390,35 @@ export const getAllOffers = () => {
  */
 export const getFeaturedOffers = () => {
   return offers.filter(offer => offer.featured);
+};
+
+/**
+ * Gets new offers (added in the last 7 days)
+ * @returns {Array} - List of new offers
+ */
+export const getNewOffers = () => {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  return offers.filter(offer => {
+    const createdAt = new Date(offer.createdAt);
+    return createdAt >= sevenDaysAgo || offer.isNew;
+  });
+};
+
+/**
+ * Gets last minute offers (departure in less than 14 days)
+ * @returns {Array} - List of last minute offers
+ */
+export const getLastMinuteOffers = () => {
+  const now = new Date();
+  const twoWeeksFromNow = new Date();
+  twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+  
+  return offers.filter(offer => {
+    const departureDate = new Date(offer.departureDate);
+    return (departureDate >= now && departureDate <= twoWeeksFromNow) || offer.isLastMinute;
+  });
 };
 
 /**
@@ -383,10 +486,16 @@ export const addOffer = (offerData) => {
   
   const newOffer = {
     id: newId,
-    ...offerData
+    ...offerData,
+    isNew: true,
+    createdAt: new Date().toISOString()
   };
   
   offers.push(newOffer);
+  
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
+  
   return newOffer;
 };
 
@@ -408,6 +517,9 @@ export const updateOffer = (id, offerData) => {
     ...offerData
   };
   
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
+  
   return offers[index];
 };
 
@@ -424,18 +536,122 @@ export const deleteOffer = (id) => {
   }
   
   offers.splice(index, 1);
+  
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
+  
   return true;
 };
 
 /**
+ * Deletes all offers for a specific agency/partner
+ * @param {string} agencyName - The agency/partner name
+ * @returns {number} - Number of offers deleted
+ */
+export const deleteOffersByAgency = (agencyName) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  loadOffersFromStorage();
+  
+  // Numărăm câte oferte vor fi șterse
+  const initialLength = offers.length;
+  
+  // Filtrăm ofertele, păstrându-le doar pe cele care NU aparțin agenției specificate
+  const remainingOffers = offers.filter(offer => offer.agency !== agencyName);
+  
+  // Calculăm câte oferte au fost eliminate
+  const deletedCount = initialLength - remainingOffers.length;
+  
+  // Actualizăm array-ul de oferte
+  offers.length = 0;
+  offers.push(...remainingOffers);
+  
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
+  
+  // Declanșăm un eveniment pentru a notifica alte componente
+  const offersUpdatedEvent = new CustomEvent('offersUpdated', {
+    detail: { offers: [...offers] }
+  });
+  window.dispatchEvent(offersUpdatedEvent);
+  
+  return deletedCount;
+};
+
+/**
  * Gets the next update time for offers
- * @returns {Date} - The next update time
+ * @returns {object} - The next update time with formatted time string
  */
 export const getNextUpdateTime = () => {
-  // Return a time 24 hours from now
-  const nextUpdate = new Date();
-  nextUpdate.setHours(nextUpdate.getHours() + 24);
-  return nextUpdate;
+  const savedTimestamp = localStorage.getItem('nextOfferUpdateTime');
+  let nextUpdate;
+  
+  if (savedTimestamp) {
+    nextUpdate = new Date(parseInt(savedTimestamp, 10));
+  } else {
+    nextUpdate = new Date();
+    nextUpdate.setMinutes(nextUpdate.getMinutes() + 30);
+    localStorage.setItem('nextOfferUpdateTime', nextUpdate.getTime().toString());
+  }
+  
+  // Format time as HH:MM:SS
+  const hours = nextUpdate.getHours().toString().padStart(2, '0');
+  const minutes = nextUpdate.getMinutes().toString().padStart(2, '0');
+  const seconds = nextUpdate.getSeconds().toString().padStart(2, '0');
+  
+  return {
+    date: nextUpdate,
+    formattedTime: `${hours}:${minutes}:${seconds}`
+  };
+};
+
+/**
+ * Removes expired offers (departure date in the past)
+ * @returns {number} - Number of offers removed
+ */
+export const removeExpiredOffers = () => {
+  const now = new Date();
+  const initialLength = offers.length;
+  
+  // Filtrăm ofertele expirate (data de plecare în trecut)
+  const validOffers = offers.filter(offer => {
+    const departureDate = new Date(offer.departureDate);
+    return departureDate >= now;
+  });
+  
+  // Actualizăm array-ul de oferte
+  offers.length = 0;
+  offers.push(...validOffers);
+  
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
+  
+  return initialLength - offers.length;
+};
+
+/**
+ * Updates offer categories (new, last minute)
+ */
+export const updateOfferCategories = () => {
+  const now = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  const twoWeeksFromNow = new Date();
+  twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+  
+  // Actualizăm categoriile pentru fiecare ofertă
+  offers.forEach(offer => {
+    // Verificăm dacă oferta este nouă (adăugată în ultimele 7 zile)
+    const createdAt = new Date(offer.createdAt);
+    offer.isNew = createdAt >= sevenDaysAgo;
+    
+    // Verificăm dacă oferta este last minute (plecare în mai puțin de 14 zile)
+    const departureDate = new Date(offer.departureDate);
+    offer.isLastMinute = departureDate >= now && departureDate <= twoWeeksFromNow;
+  });
+  
+  // Salvăm ofertele actualizate în localStorage
+  saveOffersToStorage();
 };
 
 /**
@@ -449,6 +665,12 @@ export const manualFetchOffers = async () => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
+  // Eliminăm ofertele expirate
+  const removedCount = removeExpiredOffers();
+  
+  // Actualizăm categoriile ofertelor existente
+  updateOfferCategories();
+  
   // Forțăm actualizarea ofertelor pentru toți partenerii
   const savedPartners = localStorage.getItem('partnerWebsites');
   let newOffersCount = 0;
@@ -459,10 +681,10 @@ export const manualFetchOffers = async () => {
     // Generăm oferte noi pentru toți partenerii activi
     partners.forEach(partner => {
       if (partner.active) {
-        // Verificăm dacă partenerul are deja oferte
+        // Verificăm câte oferte are partenerul în prezent
         const existingOffers = offers.filter(offer => offer.agency === partner.name);
         
-        // Dacă nu are oferte sau are mai puține decât ar trebui, generăm noi oferte
+        // Generăm oferte noi pentru a ajunge la numărul dorit
         if (existingOffers.length < partner.offersCount) {
           const numNewOffers = Math.min(3, partner.offersCount - existingOffers.length);
           const newOffers = [];
@@ -489,6 +711,19 @@ export const manualFetchOffers = async () => {
             const randomDestIndex = Math.floor(Math.random() * destinations.length);
             const randomImgIndex = Math.floor(Math.random() * images.length);
             
+            // Calculăm data de plecare (între 7 și 60 de zile în viitor)
+            const daysToAdd = Math.floor(Math.random() * 53) + 7;
+            const departureDate = new Date();
+            departureDate.setDate(departureDate.getDate() + daysToAdd);
+            
+            // Calculăm data de întoarcere
+            const returnDate = new Date(departureDate);
+            returnDate.setDate(returnDate.getDate() + duration);
+            
+            // Determinăm dacă oferta este nouă sau last minute
+            const isNew = true; // Toate ofertele noi sunt marcate ca "noi"
+            const isLastMinute = daysToAdd < 14; // Last minute dacă pleacă în mai puțin de 14 zile
+            
             const newOffer = {
               id: offers.length > 0 ? Math.max(...offers.map(o => o.id)) + 1 + i : 1 + i,
               destination: destinations[randomDestIndex],
@@ -499,12 +734,15 @@ export const manualFetchOffers = async () => {
               duration: duration,
               description: `Descoperă frumusețea orașului ${destinations[randomDestIndex].split(',')[0]} cu acest pachet special de la ${partner.name}. Include cazare, transport și ghid local.`,
               agency: partner.name,
-              departureDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString().split('T')[0],
-              returnDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (30 + duration)).toISOString().split('T')[0],
+              departureDate: departureDate.toISOString().split('T')[0],
+              returnDate: returnDate.toISOString().split('T')[0],
               transport: 'Avion',
               meals: 'Mic dejun',
               accommodation: 'Hotel 4*',
-              featured: Math.random() > 0.7 // 30% șansă să fie featured
+              featured: Math.random() > 0.7, // 30% șansă să fie featured
+              isNew: isNew,
+              isLastMinute: isLastMinute,
+              createdAt: new Date().toISOString()
             };
             
             newOffers.push(newOffer);
@@ -512,18 +750,38 @@ export const manualFetchOffers = async () => {
           
           offers.push(...newOffers);
           newOffersCount += newOffers.length;
+          
+          // Salvăm ofertele actualizate în localStorage
+          saveOffersToStorage();
         }
       }
     });
   }
   
-  // Declanșăm un eveniment de storage pentru a notifica alte componente
-  window.dispatchEvent(new Event('storage'));
+  // Resetăm cronometrul pentru următoarea actualizare
+  const nextUpdateTime = Date.now() + 30 * 60 * 1000; // 30 minute
+  localStorage.setItem('nextOfferUpdateTime', nextUpdateTime.toString());
+  
+  // Declanșăm un eveniment pentru a notifica alte componente
+  const offersUpdatedEvent = new CustomEvent('offersUpdated', {
+    detail: { offers: [...offers] }
+  });
+  window.dispatchEvent(offersUpdatedEvent);
   
   // Return a success message
   return {
     success: true,
     message: 'Ofertele au fost actualizate cu succes!',
-    newOffersCount: newOffersCount
+    newOffersCount: newOffersCount,
+    removedCount: removedCount
   };
+};
+
+/**
+ * Automatically checks for updates (called by timer)
+ * @returns {Promise<Object>} - Promise resolving to a result object
+ */
+export const autoCheckForUpdates = async () => {
+  console.log('Auto-checking for updates...');
+  return await manualFetchOffers();
 };

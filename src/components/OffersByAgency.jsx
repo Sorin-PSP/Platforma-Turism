@@ -15,25 +15,34 @@ const OffersByAgency = () => {
     // Adăugăm un event listener pentru a detecta schimbările în localStorage
     window.addEventListener('storage', handleStorageChange);
     
+    // Adăugăm un event listener pentru actualizări de oferte
+    window.addEventListener('offersUpdated', handleOffersUpdated);
+    
     // Cleanup la demontarea componentei
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('offersUpdated', handleOffersUpdated);
     };
   }, []);
   
   const handleStorageChange = (e) => {
     // Verificăm dacă schimbarea este legată de parteneri sau oferte
-    if (e.key === 'partnerWebsites') {
+    if (e.key === 'partnerWebsites' || e.key === 'tourismOffers') {
       loadData();
     }
   };
   
+  const handleOffersUpdated = () => {
+    loadData();
+  };
+  
   const loadData = () => {
     const activePartners = getAllActivePartners();
+    const offers = getAllOffers();
     
     // Pentru fiecare partener, calculăm numărul real de oferte
     const partnersWithOfferCounts = activePartners.map(partner => {
-      const partnerOffers = allOffers.filter(offer => offer.agency === partner.name);
+      const partnerOffers = offers.filter(offer => offer.agency === partner.name);
       return {
         ...partner,
         offersCount: partnerOffers.length || partner.offersCount
@@ -41,20 +50,7 @@ const OffersByAgency = () => {
     });
     
     setAgencies(partnersWithOfferCounts);
-    
-    const offers = getAllOffers();
-    
-    // Asigurăm-ne că fiecare ofertă are o agenție asociată
-    // Dacă nu are, îi atribuim una din agențiile active
-    const updatedOffers = offers.map(offer => {
-      if (!offer.agency && activePartners.length > 0) {
-        const randomAgency = activePartners[Math.floor(Math.random() * activePartners.length)];
-        return { ...offer, agency: randomAgency.name };
-      }
-      return offer;
-    });
-    
-    setAllOffers(updatedOffers);
+    setAllOffers(offers);
   };
   
   // Filter offers by selected agency or show all if none selected
@@ -112,6 +108,16 @@ const OffersByAgency = () => {
                 <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
                   {offer.discount || Math.floor(Math.random() * 20) + 5}% reducere
                 </div>
+                {offer.isNew && (
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                    Nou
+                  </div>
+                )}
+                {offer.isLastMinute && (
+                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                    Last Minute
+                  </div>
+                )}
               </div>
               
               <div className="p-4">

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaGlobe, FaList, FaSync, FaExclamationTriangle } from 'react-icons/fa';
 import { getAllPartners } from '../services/partnerService';
-import { getAllOffers, manualFetchOffers, getNextUpdateTime } from '../services/offerService';
+import { getAllOffers, manualFetchOffers, getNextUpdateTime, autoCheckForUpdates } from '../services/offerService';
+import OfferUpdateStatus from '../components/OfferUpdateStatus';
 
 const AdminDashboardPage = () => {
   const [partners, setPartners] = useState([]);
@@ -9,11 +10,11 @@ const AdminDashboardPage = () => {
   const [updateInfo, setUpdateInfo] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateMessage, setUpdateMessage] = useState(null);
+  const [lastUpdateTime, setLastUpdateTime] = useState(null);
 
   useEffect(() => {
     // Load initial data
-    setPartners(getAllPartners());
-    setOffers(getAllOffers());
+    loadDashboardData();
 
     // Set up timer for next update
     const timer = setInterval(() => {
@@ -24,27 +25,92 @@ const AdminDashboardPage = () => {
     const handleOffersUpdated = (event) => {
       const { offers } = event.detail;
       setOffers(offers);
+      setLastUpdateTime(new Date().toLocaleTimeString());
     };
 
     window.addEventListener('offersUpdated', handleOffersUpdated);
+    
+    // Listen for storage changes
+    const handleStorageChange = (e) => {
+      if (e.key === 'partnerWebsites' || e.key === 'tourismOffers') {
+        loadDashboardData();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
       clearInterval(timer);
       window.removeEventListener('offersUpdated', handleOffersUpdated);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+  
+  const loadDashboardData = () => {
+    setPartners(getAllPartners());
+    setOffers(getAllOffers());
+    
+    // Verificăm dacă există un timestamp pentru ultima actualizare
+    const lastUpdate = localStorage.getItem('lastOfferUpdateTime');
+    if (lastUpdate) {
+      setLastUpdateTime(new Date(parseInt(lastUpdate, 10)).toLocaleTimeString());
+    }
+  };
 
   const handleManualUpdate = async () => {
+    if (isUpdating) return; // Prevenim actualizări multiple simultane
+    
     setIsUpdating(true);
     setUpdateMessage({ type: 'info', text: 'Se actualizează ofertele...' });
 
     try {
       const updatedOffers = await manualFetchOffers();
       setOffers(getAllOffers()); // Refresh offers from service
-      setUpdateMessage({ type: 'success', text: 'Ofertele au fost actualizate cu succes!' });
+      
+      // Salvăm timestamp-ul actualizării
+      const now = Date.now();
+      localStorage.setItem('lastOfferUpdateTime', now.toString());
+      setLastUpdateTime(new Date(now).toLocaleTimeString());
+      
+      setUpdateMessage({ 
+        type: 'success', 
+        text: `Ofertele au fost actualizate cu succes! ${updatedOffers.newOffersCount} oferte noi adăugate, ${updatedOffers.removedCount} oferte expirate eliminate.` 
+      });
     } catch (error) {
       console.error('Error updating offers:', error);
       setUpdateMessage({ type: 'error', text: 'A apărut o eroare la actualizarea ofertelor.' });
+    } finally {
+      setIsUpdating(false);
+      
+      // Clear message after 5 seconds
+      setTimeout(() => {
+        setUpdateMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleAutoUpdate = async () => {
+    if (isUpdating) return; // Prevenim actualizări multiple simultane
+    
+    setIsUpdating(true);
+    setUpdateMessage({ type: 'info', text: 'Se verifică automat ofertele...' });
+
+    try {
+      const result = await autoCheckForUpdates();
+      setOffers(getAllOffers()); // Refresh offers from service
+      
+      // Salvăm timestamp-ul actualizării
+      const now = Date.now();
+      localStorage.setItem('lastOfferUpdateTime', now.toString());
+      setLastUpdateTime(new Date(now).toLocaleTimeString());
+      
+      setUpdateMessage({ 
+        type: 'success', 
+        text: `Actualizare automată completă! ${result.newOffersCount} oferte noi adăugate, ${result.removedCount} oferte expirate eliminate.` 
+      });
+    } catch (error) {
+      console.error('Error during auto update:', error);
+      setUpdateMessage({ type: 'error', text: 'A apărut o eroare la actualizarea automată a ofertelor.' });
     } finally {
       setIsUpdating(false);
       
@@ -64,6 +130,9 @@ const AdminDashboardPage = () => {
     if (offer && offer.location) {
       const location = offer.location.split(',')[0].trim();
       acc[location] = (acc[location] || 0) + 1;
+    } else if (offer && offer.destination) {
+      const location = offer.destination.split(',')[0].trim();
+      acc[location] = (acc[location] || 0) + 1;
     }
     return acc;
   }, {});
@@ -81,6 +150,11 @@ const AdminDashboardPage = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
         <p className="text-gray-600">Bine ați venit în panoul de administrare</p>
+        {lastUpdateTime && (
+          <p className="text-sm text-gray-500 mt-1">
+            Ultima actualizare: {lastUpdateTime}
+          </p>
+        )}
       </div>
 
       {updateMessage && (
@@ -140,7 +214,9 @@ const AdminDashboardPage = () => {
             </div>
             <div>
               <div className="text-sm font-medium text-gray-500">Următoarea Actualizare</div>
-              <div className="text-2xl font-semibold">{updateInfo?.formattedTime || '...'}</div>
+              <div className="text-2xl font-semibold">
+                <OfferUpdateStatus onUpdateNeeded={handleAutoUpdate} />
+              </div>
             </div>
           </div>
           <div className="mt-4">
@@ -163,6 +239,7 @@ const AdminDashboardPage = () => {
           <div className="space-y-4">
             {Object.entries(offersByLocation)
               .sort((a, b) => b[1] - a[1])
+              .slice(0, 8) // Limitează la primele 8 destinații
               .map(([location, count]) => (
                 <div key={location} className="flex items-center">
                   <div className="w-32 font-medium">{location}</div>
@@ -185,6 +262,7 @@ const AdminDashboardPage = () => {
           <div className="space-y-4">
             {Object.entries(offersByAgency)
               .sort((a, b) => b[1] - a[1])
+              .slice(0, 8) // Limitează la primele 8 agenții
               .map(([agency, count]) => (
                 <div key={agency} className="flex items-center">
                   <div className="w-32 font-medium">{agency}</div>

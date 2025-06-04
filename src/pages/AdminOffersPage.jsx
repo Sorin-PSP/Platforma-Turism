@@ -15,11 +15,26 @@ const AdminOffersPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Get unique values for filter dropdowns
-  const locations = [...new Set(offers.map(offer => offer.location.split(',')[0].trim()))];
-  const agencies = [...new Set(offers.map(offer => offer.agency))];
-  const transports = [...new Set(offers.map(offer => offer.transport))];
-  const mealTypes = [...new Set(offers.map(offer => offer.meals))];
+  // Get unique values for filter dropdowns - with null checks to prevent errors
+  const locations = [...new Set(offers
+    .filter(offer => offer && offer.location)
+    .map(offer => offer.location.split(',')[0].trim())
+  )];
+  
+  const agencies = [...new Set(offers
+    .filter(offer => offer && offer.agency)
+    .map(offer => offer.agency)
+  )];
+  
+  const transports = [...new Set(offers
+    .filter(offer => offer && offer.transport)
+    .map(offer => offer.transport)
+  )];
+  
+  const mealTypes = [...new Set(offers
+    .filter(offer => offer && offer.meals)
+    .map(offer => offer.meals)
+  )];
 
   useEffect(() => {
     // Load initial data
@@ -52,29 +67,36 @@ const AdminOffersPage = () => {
     if (search) {
       const searchLower = search.toLowerCase();
       result = result.filter(offer => 
-        offer.title.toLowerCase().includes(searchLower) ||
-        offer.location.toLowerCase().includes(searchLower) ||
-        offer.agency.toLowerCase().includes(searchLower)
+        (offer.title && offer.title.toLowerCase().includes(searchLower)) ||
+        (offer.location && offer.location.toLowerCase().includes(searchLower)) ||
+        (offer.destination && offer.destination.toLowerCase().includes(searchLower)) ||
+        (offer.agency && offer.agency.toLowerCase().includes(searchLower))
       );
     }
 
-    // Apply filters
+    // Apply filters with null checks
     if (filterCriteria.location) {
       result = result.filter(offer => 
-        offer.location.split(',')[0].trim() === filterCriteria.location
+        offer.location && offer.location.split(',')[0].trim() === filterCriteria.location
       );
     }
 
     if (filterCriteria.agency) {
-      result = result.filter(offer => offer.agency === filterCriteria.agency);
+      result = result.filter(offer => 
+        offer.agency && offer.agency === filterCriteria.agency
+      );
     }
 
     if (filterCriteria.transport) {
-      result = result.filter(offer => offer.transport === filterCriteria.transport);
+      result = result.filter(offer => 
+        offer.transport && offer.transport === filterCriteria.transport
+      );
     }
 
     if (filterCriteria.meals) {
-      result = result.filter(offer => offer.meals === filterCriteria.meals);
+      result = result.filter(offer => 
+        offer.meals && offer.meals === filterCriteria.meals
+      );
     }
 
     setFilteredOffers(result);
@@ -260,12 +282,12 @@ const AdminOffersPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-md object-cover" src={offer.image} alt={offer.title} />
+                        <img className="h-10 w-10 rounded-md object-cover" src={offer.image} alt={offer.title || offer.destination || 'Ofertă turistică'} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{offer.title}</div>
+                        <div className="text-sm font-medium text-gray-900">{offer.title || offer.destination || 'Ofertă turistică'}</div>
                         <div className="flex items-center">
-                          {[...Array(offer.stars)].map((_, i) => (
+                          {[...Array(offer.stars || 4)].map((_, i) => (
                             <FaStar key={i} className="text-yellow-400 text-xs" />
                           ))}
                         </div>
@@ -273,20 +295,20 @@ const AdminOffersPage = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{offer.location}</div>
+                    <div className="text-sm text-gray-900">{offer.location || offer.destination || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 font-medium">{offer.price} €</div>
                     <div className="text-sm text-gray-500 line-through">{offer.oldPrice} €</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{offer.agency}</div>
+                    <div className="text-sm text-gray-900">{offer.agency || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{offer.transport}</div>
+                    <div className="text-sm text-gray-900">{offer.transport || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{offer.meals}</div>
+                    <div className="text-sm text-gray-900">{offer.meals || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{offer.duration} zile</div>

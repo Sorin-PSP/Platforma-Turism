@@ -1,4 +1,5 @@
 import { partnerApiEndpoints } from './offerService';
+import { deleteOffersByAgency } from './offerService';
 
 // Verificăm dacă există date salvate în localStorage
 const getSavedPartners = () => {
@@ -143,7 +144,7 @@ export const updatePartner = (id, partnerData) => {
 /**
  * Deletes a partner
  * @param {number} id - The partner ID to delete
- * @returns {boolean} - Whether the deletion was successful
+ * @returns {object} - Object containing success status and deleted partner info
  */
 export const deletePartner = (id) => {
   // Reîncărcăm din localStorage pentru a asigura date actualizate
@@ -155,7 +156,7 @@ export const deletePartner = (id) => {
   const index = partnerWebsites.findIndex(partner => partner.id === parseInt(id));
   
   if (index === -1) {
-    return false;
+    return { success: false };
   }
   
   const deletedPartner = partnerWebsites[index];
@@ -164,11 +165,17 @@ export const deletePartner = (id) => {
   // Salvăm în localStorage
   savePartnersToStorage();
   
-  // Update the partner API endpoints in the offer service
-  // In a real implementation, this would update the actual service configuration
-  console.log(`Deleted partner: ${deletedPartner.name} (${deletedPartner.apiEndpoint})`);
+  // Ștergem toate ofertele asociate acestui partener
+  const deletedOffersCount = deleteOffersByAgency(deletedPartner.name);
   
-  return true;
+  console.log(`Deleted partner: ${deletedPartner.name} (${deletedPartner.apiEndpoint})`);
+  console.log(`Deleted ${deletedOffersCount} offers associated with partner ${deletedPartner.name}`);
+  
+  return { 
+    success: true, 
+    partner: deletedPartner, 
+    deletedOffersCount 
+  };
 };
 
 /**
