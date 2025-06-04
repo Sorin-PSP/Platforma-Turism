@@ -40,8 +40,8 @@ const ContactPage = () => {
             </div>
             <h3 className="text-xl font-semibold mb-3">Adresa noastră</h3>
             <p className="text-gray-600">
-              Strada Exemplu, Nr. 123<br />
-              București, Sector 1<br />
+              Șos. Berceni Nr. 80A<br />
+              Sector 4, București<br />
               România
             </p>
           </div>
@@ -52,10 +52,7 @@ const ContactPage = () => {
             </div>
             <h3 className="text-xl font-semibold mb-3">Telefon</h3>
             <p className="text-gray-600 mb-2">
-              <a href="tel:+40712345678" className="hover:text-primary">+40 712 345 678</a> (Suport clienți)
-            </p>
-            <p className="text-gray-600">
-              <a href="tel:+40723456789" className="hover:text-primary">+40 723 456 789</a> (Rezervări)
+              <a href="tel:0770970509" className="hover:text-primary">0770 970 509</a> (Suport clienți)
             </p>
           </div>
 
@@ -65,10 +62,7 @@ const ContactPage = () => {
             </div>
             <h3 className="text-xl font-semibold mb-3">Email</h3>
             <p className="text-gray-600 mb-2">
-              <a href="mailto:contact@travelro.ro" className="hover:text-primary">contact@travelro.ro</a> (Informații generale)
-            </p>
-            <p className="text-gray-600">
-              <a href="mailto:support@travelro.ro" className="hover:text-primary">support@travelro.ro</a> (Suport tehnic)
+              <a href="mailto:office@traveldeal.ro" className="hover:text-primary">office@traveldeal.ro</a> (Informații generale)
             </p>
           </div>
         </div>
@@ -190,7 +184,7 @@ const ContactPage = () => {
             allowFullScreen="" 
             loading="lazy" 
             referrerPolicy="no-referrer-when-downgrade"
-            title="Locația TravelRo"
+            title="Locația TravelDeal"
           ></iframe>
         </div>
       </div>

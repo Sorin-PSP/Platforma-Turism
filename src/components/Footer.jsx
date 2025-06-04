@@ -66,10 +66,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <address className="not-italic text-gray-300">
-              <p>Strada Exemplu, Nr. 123</p>
-              <p>București, România</p>
-              <p className="mt-2">Email: contact@traveldeal.ro</p>
-              <p>Telefon: +40 712 345 678</p>
+              <p>Șos. Berceni Nr. 80A</p>
+              <p>Sector 4, București, România</p>
+              <p className="mt-2">Email: office@traveldeal.ro</p>
+              <p>Telefon: 0770 970 509</p>
             </address>
           </div>
         </div>
