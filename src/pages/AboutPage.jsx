@@ -90,48 +90,61 @@ const AboutPage = () => {
         </div>
 
         <div className="bg-gray-50 p-8 rounded-lg mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-center">Povestea noastră</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center">Cum se folosește platforma</h2>
           <div className="max-w-3xl mx-auto">
             <p className="text-gray-700 mb-4">
-              TravelDeal a fost fondată în 2020 de către un grup de entuziaști ai călătoriilor care au observat dificultatea de a compara ofertele turistice disponibile pe piața din România.
+              Platforma TravelDeal este ușor de utilizat și vă oferă acces rapid la cele mai bune oferte turistice. Iată cum puteți beneficia de toate funcționalitățile:
             </p>
-            <p className="text-gray-700 mb-4">
-              Ceea ce a început ca un proiect mic s-a transformat rapid într-o platformă completă care conectează călătorii cu cele mai bune oferte de la agenții de turism de renume.
-            </p>
-            <p className="text-gray-700 mb-4">
-              Astăzi, TravelDeal este utilizată de mii de români pentru a-și planifica vacanțele, economisind în medie 15% din costul total al călătoriilor lor.
-            </p>
-            <p className="text-gray-700">
-              Continuăm să ne dezvoltăm și să adăugăm noi funcționalități pentru a face experiența de căutare și rezervare cât mai simplă și eficientă pentru utilizatorii noștri.
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-6">Echipa noastră</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-12">
-            Suntem o echipă pasionată de călătorii și tehnologie, dedicată să oferim cea mai bună experiență utilizatorilor noștri.
-          </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: 'Alexandru Popescu', role: 'CEO & Fondator', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
-              { name: 'Maria Ionescu', role: 'Director Marketing', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
-              { name: 'Andrei Dumitrescu', role: 'Lead Developer', image: 'https://randomuser.me/api/portraits/men/62.jpg' },
-              { name: 'Elena Stanescu', role: 'Customer Success', image: 'https://randomuser.me/api/portraits/women/68.jpg' }
-            ].map((member, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <img 
-                  src={member.image} 
-                  alt={member.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg">{member.name}</h3>
-                  <p className="text-gray-600">{member.role}</p>
-                </div>
-              </div>
-            ))}
+            
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">1. Crearea unui cont</h3>
+              <p className="text-gray-700 mb-2">
+                Pentru a beneficia de toate funcționalitățile platformei, vă recomandăm să vă creați un cont gratuit. Acest lucru vă permite să:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700">
+                <li>Salvați ofertele favorite pentru a le consulta ulterior</li>
+                <li>Setați alerte personalizate pentru destinațiile preferate</li>
+                <li>Primiți notificări când apar oferte care corespund criteriilor dumneavoastră</li>
+              </ul>
+            </div>
+            
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">2. Căutarea ofertelor</h3>
+              <p className="text-gray-700 mb-2">
+                Utilizați filtrele disponibile pentru a găsi exact ceea ce căutați:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700">
+                <li>Selectați destinația dorită</li>
+                <li>Alegeți perioada în care doriți să călătoriți</li>
+                <li>Stabiliți bugetul disponibil</li>
+                <li>Filtrați după tipul de vacanță (city break, all inclusive, circuit etc.)</li>
+              </ul>
+            </div>
+            
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">3. Setarea alertelor</h3>
+              <p className="text-gray-700 mb-2">
+                Configurați alerte personalizate pentru a fi notificat când apar oferte care vă interesează:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700">
+                <li>Definiți criteriile importante pentru dumneavoastră</li>
+                <li>Alegeți frecvența notificărilor (zilnic, săptămânal)</li>
+                <li>Primiți alerte pe email sau în aplicație</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-2">4. Funcționalități premium</h3>
+              <p className="text-gray-700 mb-2">
+                Utilizatorii premium beneficiază de avantaje suplimentare:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700">
+                <li>Acces prioritar la ofertele last minute</li>
+                <li>Notificări în timp real pentru destinațiile favorite</li>
+                <li>Consultanță personalizată pentru planificarea vacanței</li>
+                <li>Reduceri exclusive la anumite agenții partenere</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
