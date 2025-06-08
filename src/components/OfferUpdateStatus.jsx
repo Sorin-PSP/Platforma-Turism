@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaClock } from 'react-icons/fa';
+import { getNextUpdateTime, resetUpdateTimer } from '../services/offerService';
 
 const OfferUpdateStatus = ({ onUpdateNeeded }) => {
   const [timeRemaining, setTimeRemaining] = useState({
@@ -8,11 +9,10 @@ const OfferUpdateStatus = ({ onUpdateNeeded }) => {
   });
   
   useEffect(() => {
-    // Verificăm dacă există un timestamp salvat în localStorage
-    const savedTimestamp = localStorage.getItem('nextOfferUpdateTime');
+    // Verificăm dacă există un timestamp salvat
+    const nextUpdateTime = getNextUpdateTime();
     
-    if (savedTimestamp) {
-      const nextUpdateTime = parseInt(savedTimestamp, 10);
+    if (nextUpdateTime) {
       const now = Date.now();
       
       // Dacă timpul salvat este în viitor, calculăm timpul rămas
@@ -27,7 +27,7 @@ const OfferUpdateStatus = ({ onUpdateNeeded }) => {
         });
       } else {
         // Dacă timpul a expirat, resetăm cronometrul și declanșăm actualizarea
-        resetTimer();
+        resetUpdateTimer();
         if (onUpdateNeeded) {
           setTimeout(() => {
             onUpdateNeeded();
@@ -36,22 +36,20 @@ const OfferUpdateStatus = ({ onUpdateNeeded }) => {
       }
     } else {
       // Dacă nu există un timestamp salvat, setăm unul pentru 30 de minute în viitor
-      const nextUpdateTime = Date.now() + 30 * 60 * 1000;
-      localStorage.setItem('nextOfferUpdateTime', nextUpdateTime.toString());
+      resetUpdateTimer();
     }
     
     // Setăm un interval pentru a actualiza cronometrul în fiecare secundă
     const timerInterval = setInterval(() => {
       setTimeRemaining(prev => {
         // Calculăm timpul rămas bazat pe timestamp-ul din localStorage
-        const savedTimestamp = localStorage.getItem('nextOfferUpdateTime');
-        if (savedTimestamp) {
-          const nextUpdateTime = parseInt(savedTimestamp, 10);
+        const nextUpdateTime = getNextUpdateTime();
+        if (nextUpdateTime) {
           const now = Date.now();
           
           if (nextUpdateTime <= now) {
             // Timpul a expirat, resetăm cronometrul și declanșăm actualizarea
-            resetTimer();
+            resetUpdateTimer();
             if (onUpdateNeeded) {
               setTimeout(() => {
                 onUpdateNeeded();
@@ -73,7 +71,7 @@ const OfferUpdateStatus = ({ onUpdateNeeded }) => {
         
         // Dacă nu există timestamp, continuăm cu decrementarea normală
         if (prev.minutes === 0 && prev.seconds === 0) {
-          resetTimer();
+          resetUpdateTimer();
           if (onUpdateNeeded) {
             setTimeout(() => {
               onUpdateNeeded();
@@ -95,13 +93,6 @@ const OfferUpdateStatus = ({ onUpdateNeeded }) => {
       clearInterval(timerInterval);
     };
   }, [onUpdateNeeded]);
-  
-  // Funcție pentru a reseta cronometrul
-  const resetTimer = () => {
-    const nextUpdateTime = Date.now() + 30 * 60 * 1000;
-    localStorage.setItem('nextOfferUpdateTime', nextUpdateTime.toString());
-    setTimeRemaining({ minutes: 30, seconds: 0 });
-  };
   
   // Formatăm timpul pentru afișare
   const formattedMinutes = timeRemaining.minutes.toString().padStart(2, '0');

@@ -32,6 +32,11 @@ const savePartnersToStorage = () => {
   window.dispatchEvent(new Event('storage'));
 };
 
+// Asigurăm că partenerii sunt salvați inițial în localStorage
+if (!getSavedPartners()) {
+  savePartnersToStorage();
+}
+
 /**
  * Gets all partner websites
  * @returns {Array} - List of partner websites
@@ -64,6 +69,11 @@ export const getAllActivePartners = () => {
  * @returns {object|undefined} - The partner or undefined if not found
  */
 export const getPartnerById = (id) => {
+  // Reîncărcăm din localStorage pentru a asigura date actualizate
+  const savedPartners = getSavedPartners();
+  if (savedPartners) {
+    partnerWebsites = savedPartners;
+  }
   return partnerWebsites.find(partner => partner.id === parseInt(id));
 };
 
