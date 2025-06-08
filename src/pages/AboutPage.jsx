@@ -99,12 +99,12 @@ const AboutPage = () => {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">1. Crearea unui cont</h3>
               <p className="text-gray-700 mb-2">
-                Pentru a beneficia de toate funcționalitățile platformei, vă recomandăm să vă creați un cont gratuit. Acest lucru vă permite să:
+                Pentru a beneficia de funcționalitățile platformei, trebuie să vă creați un cont gratuit. Acest lucru vă permite să:
               </p>
               <ul className="list-disc pl-6 text-gray-700">
-                <li>Salvați ofertele favorite pentru a le consulta ulterior</li>
-                <li>Setați alerte personalizate pentru destinațiile preferate</li>
-                <li>Primiți notificări când apar oferte care corespund criteriilor dumneavoastră</li>
+                <li>Cautati in functie de preferinte intre mii de oferte</li>
+                <li>Cautati in functie de agentie</li>
+                <li>Primiti pe email cele mai noi oferte periodic</li>
               </ul>
             </div>
             
@@ -116,20 +116,26 @@ const AboutPage = () => {
               <ul className="list-disc pl-6 text-gray-700">
                 <li>Selectați destinația dorită</li>
                 <li>Alegeți perioada în care doriți să călătoriți</li>
-                <li>Stabiliți bugetul disponibil</li>
-                <li>Filtrați după tipul de vacanță (city break, all inclusive, circuit etc.)</li>
+                <li>Puteti cauta dupe tipul de vacanta(last minute sau cele mai noi oferte speciale.)</li>
               </ul>
             </div>
             
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">3. Setarea alertelor</h3>
               <p className="text-gray-700 mb-2">
-                Configurați alerte personalizate pentru a fi notificat când apar oferte care vă interesează:
+                Pentru clientii cu cont gratuit:
               </p>
               <ul className="list-disc pl-6 text-gray-700">
+                <li>Nu trebuie sa va faceti griji, odata deshis contul veti primi cele mai noi oferte ale agentiilor pe adresa de email setata</li>
+              </ul>
+              <p className="text-gray-700 mt-2 mb-2">
+                Pentru clientii Premium:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700">
+                <li>Configurați alerte personalizate pentru a fi notificat când apar oferte care vă interesează</li>
                 <li>Definiți criteriile importante pentru dumneavoastră</li>
-                <li>Alegeți frecvența notificărilor (zilnic, săptămânal)</li>
-                <li>Primiți alerte pe email sau în aplicație</li>
+                <li>Alegeți frecvența notificărilor (atunci cand apar noutati, zilnic, săptămânal, etc)</li>
+                <li>Primiți alerte in telefonul mobil</li>
               </ul>
             </div>
             
@@ -139,9 +145,8 @@ const AboutPage = () => {
                 Utilizatorii premium beneficiază de avantaje suplimentare:
               </p>
               <ul className="list-disc pl-6 text-gray-700">
-                <li>Acces prioritar la ofertele last minute</li>
                 <li>Notificări în timp real pentru destinațiile favorite</li>
-                <li>Consultanță personalizată pentru planificarea vacanței</li>
+                <li>Acces prioritar la ofertele last minute</li>
                 <li>Reduceri exclusive la anumite agenții partenere</li>
               </ul>
             </div>

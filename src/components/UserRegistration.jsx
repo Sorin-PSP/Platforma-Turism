@@ -69,6 +69,11 @@ const UserRegistration = ({ onSuccess }) => {
       newErrors.confirmPassword = 'Parolele nu coincid';
     }
     
+    // Verifică dacă utilizatorul a bifat căsuța de abonare la oferte
+    if (!formData.subscribeToOffers) {
+      newErrors.subscribeToOffers = 'Trebuie să fiți de acord cu primirea ofertelor pentru a vă înregistra';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -294,18 +299,21 @@ const UserRegistration = ({ onSuccess }) => {
             </div>
             
             <div className="mb-2">
-              <div className="flex items-start">
+              <div className={`flex items-start ${errors.subscribeToOffers ? 'pb-4 relative' : ''}`}>
                 <input
                   type="checkbox"
                   id="subscribeToOffers"
                   name="subscribeToOffers"
                   checked={formData.subscribeToOffers}
                   onChange={handleChange}
-                  className="mt-0.5 mr-2"
+                  className={`mt-0.5 mr-2 ${errors.subscribeToOffers ? 'border-red-500' : ''}`}
                 />
-                <label htmlFor="subscribeToOffers" className="text-gray-700">
+                <label htmlFor="subscribeToOffers" className={`text-gray-700 ${errors.subscribeToOffers ? 'text-red-500' : ''}`}>
                   Sunt de acord să primesc oferte și noutăți pe email
                 </label>
+                {errors.subscribeToOffers && (
+                  <p className="text-red-500 text-xs absolute bottom-0 left-0">{errors.subscribeToOffers}</p>
+                )}
               </div>
             </div>
           </>
