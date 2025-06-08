@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllActivePartners } from '../services/partnerService';
+import { getAllOffers } from '../services/offerService';
 
 const AgenciesList = () => {
   const [agencies, setAgencies] = useState([]);
@@ -11,23 +12,42 @@ const AgenciesList = () => {
     // Adăugăm un event listener pentru a detecta schimbările în localStorage
     window.addEventListener('storage', handleStorageChange);
     
+    // Adăugăm un event listener pentru actualizări de oferte
+    window.addEventListener('offersUpdated', handleOffersUpdated);
+    
     // Cleanup la demontarea componentei
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('offersUpdated', handleOffersUpdated);
     };
   }, []);
   
   const handleStorageChange = (e) => {
-    // Verificăm dacă schimbarea este legată de parteneri
-    if (e.key === 'partnerWebsites') {
+    // Verificăm dacă schimbarea este legată de parteneri sau oferte
+    if (e.key === 'partnerWebsites' || e.key === 'offers') {
       loadAgencies();
     }
+  };
+  
+  const handleOffersUpdated = () => {
+    loadAgencies();
   };
   
   const loadAgencies = () => {
     // Get all active partners from the service
     const activePartners = getAllActivePartners();
-    setAgencies(activePartners);
+    
+    // Calculăm numărul real de oferte pentru fiecare agenție
+    const offers = getAllOffers();
+    const partnersWithOfferCounts = activePartners.map(partner => {
+      const partnerOffers = offers.filter(offer => offer.agency === partner.name);
+      return {
+        ...partner,
+        offersCount: partnerOffers.length
+      };
+    });
+    
+    setAgencies(partnersWithOfferCounts);
   };
   
   return (

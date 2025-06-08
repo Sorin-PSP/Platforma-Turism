@@ -8,7 +8,8 @@ import {
   FaSignOutAlt, 
   FaUser, 
   FaBars, 
-  FaTimes 
+  FaTimes,
+  FaHome
 } from 'react-icons/fa';
 
 const AdminLayout = ({ children }) => {
@@ -77,6 +78,15 @@ const AdminLayout = ({ children }) => {
               {item.label}
             </Link>
           ))}
+          
+          {/* Return to site button */}
+          <Link
+            to="/"
+            className="group flex items-center px-2 py-2 mt-4 text-base font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
+          >
+            <span className="mr-3"><FaHome /></span>
+            Înapoi la site
+          </Link>
         </nav>
 
         <div className="absolute bottom-0 w-full border-t border-gray-700 p-4">
@@ -110,6 +120,15 @@ const AdminLayout = ({ children }) => {
                 <span className="ml-2 text-gray-700">{user?.username || 'Admin'}</span>
               </div>
             </div>
+            
+            {/* Return to site button in header for better visibility */}
+            <Link
+              to="/"
+              className="flex items-center text-primary hover:text-primary-dark"
+            >
+              <FaHome className="mr-1" />
+              <span>Înapoi la site</span>
+            </Link>
           </div>
         </header>
 

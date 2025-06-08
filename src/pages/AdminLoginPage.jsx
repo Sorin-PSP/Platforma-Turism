@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { login, isUserAuthenticated } from '../services/authService';
-import { FaLock, FaUser } from 'react-icons/fa';
+import { FaLock, FaUser, FaHome } from 'react-icons/fa';
 
 const AdminLoginPage = () => {
   const [username, setUsername] = useState('');
@@ -42,6 +42,17 @@ const AdminLoginPage = () => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">Panou de Administrare</h1>
           <p className="text-gray-600">Autentificați-vă pentru a accesa panoul de administrare</p>
+        </div>
+
+        {/* Return to site button */}
+        <div className="absolute top-4 left-4">
+          <Link 
+            to="/" 
+            className="flex items-center text-primary hover:text-primary-dark font-medium"
+          >
+            <FaHome className="mr-2" />
+            Înapoi la site
+          </Link>
         </div>
 
         {error && (

@@ -27,7 +27,7 @@ const OffersByAgency = () => {
   
   const handleStorageChange = (e) => {
     // Verificăm dacă schimbarea este legată de parteneri sau oferte
-    if (e.key === 'partnerWebsites' || e.key === 'tourismOffers') {
+    if (e.key === 'partnerWebsites' || e.key === 'offers') {
       loadData();
     }
   };
@@ -37,20 +37,22 @@ const OffersByAgency = () => {
   };
   
   const loadData = () => {
-    const activePartners = getAllActivePartners();
     const offers = getAllOffers();
+    setAllOffers(offers);
+    
+    // Obținem partenerii activi
+    const activePartners = getAllActivePartners();
     
     // Pentru fiecare partener, calculăm numărul real de oferte
     const partnersWithOfferCounts = activePartners.map(partner => {
       const partnerOffers = offers.filter(offer => offer.agency === partner.name);
       return {
         ...partner,
-        offersCount: partnerOffers.length || partner.offersCount
+        offersCount: partnerOffers.length
       };
     });
     
     setAgencies(partnersWithOfferCounts);
-    setAllOffers(offers);
   };
   
   // Filter offers by selected agency or show all if none selected

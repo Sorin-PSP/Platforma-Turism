@@ -23,8 +23,7 @@ const AdminDashboardPage = () => {
 
     // Listen for offer updates
     const handleOffersUpdated = (event) => {
-      const { offers } = event.detail;
-      setOffers(offers);
+      loadDashboardData(); // Reîncărcăm toate datele pentru a asigura sincronizarea
       setLastUpdateTime(new Date().toLocaleTimeString());
     };
 
@@ -32,7 +31,7 @@ const AdminDashboardPage = () => {
     
     // Listen for storage changes
     const handleStorageChange = (e) => {
-      if (e.key === 'partnerWebsites' || e.key === 'tourismOffers') {
+      if (e.key === 'partnerWebsites' || e.key === 'offers') {
         loadDashboardData();
       }
     };
@@ -47,8 +46,21 @@ const AdminDashboardPage = () => {
   }, []);
   
   const loadDashboardData = () => {
-    setPartners(getAllPartners());
-    setOffers(getAllOffers());
+    // Încărcăm partenerii și ofertele
+    const allPartners = getAllPartners();
+    const allOffers = getAllOffers();
+    
+    // Actualizăm numărul de oferte pentru fiecare partener
+    const partnersWithUpdatedCounts = allPartners.map(partner => {
+      const partnerOffers = allOffers.filter(offer => offer.agency === partner.name);
+      return {
+        ...partner,
+        offersCount: partnerOffers.length
+      };
+    });
+    
+    setPartners(partnersWithUpdatedCounts);
+    setOffers(allOffers);
     
     // Verificăm dacă există un timestamp pentru ultima actualizare
     const lastUpdate = localStorage.getItem('lastOfferUpdateTime');
@@ -65,7 +77,9 @@ const AdminDashboardPage = () => {
 
     try {
       const updatedOffers = await manualFetchOffers();
-      setOffers(getAllOffers()); // Refresh offers from service
+      
+      // Reîncărcăm datele pentru a asigura sincronizarea
+      loadDashboardData();
       
       // Salvăm timestamp-ul actualizării
       const now = Date.now();
@@ -97,7 +111,9 @@ const AdminDashboardPage = () => {
 
     try {
       const result = await autoCheckForUpdates();
-      setOffers(getAllOffers()); // Refresh offers from service
+      
+      // Reîncărcăm datele pentru a asigura sincronizarea
+      loadDashboardData();
       
       // Salvăm timestamp-ul actualizării
       const now = Date.now();

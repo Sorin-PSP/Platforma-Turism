@@ -1,5 +1,5 @@
 import { partnerApiEndpoints } from './offerService';
-import { deleteOffersByAgency } from './offerService';
+import { deleteOffersByAgency, getAllOffers } from './offerService';
 
 // Verificăm dacă există date salvate în localStorage
 const getSavedPartners = () => {
@@ -19,13 +19,26 @@ let partnerWebsites = getSavedPartners() || partnerApiEndpoints.map((endpoint, i
     apiEndpoint: endpoint,
     active: true,
     lastFetch: new Date().toISOString(),
-    offersCount: Math.floor(Math.random() * 50) + 10,
+    offersCount: 0, // Inițializăm cu 0 și vom actualiza corect mai jos
     logo: `https://via.placeholder.com/150x50?text=${name.charAt(0).toUpperCase() + name.slice(1)}`
   };
 });
 
+// Actualizăm numărul de oferte pentru fiecare partener
+const updatePartnerOfferCounts = () => {
+  const allOffers = getAllOffers();
+  
+  partnerWebsites.forEach(partner => {
+    const partnerOffers = allOffers.filter(offer => offer.agency === partner.name);
+    partner.offersCount = partnerOffers.length;
+  });
+};
+
 // Funcție pentru a salva partenerii în localStorage
 const savePartnersToStorage = () => {
+  // Actualizăm mai întâi numărul de oferte
+  updatePartnerOfferCounts();
+  
   localStorage.setItem('partnerWebsites', JSON.stringify(partnerWebsites));
   
   // Declanșăm un eveniment de storage pentru a notifica alte componente
@@ -34,6 +47,10 @@ const savePartnersToStorage = () => {
 
 // Asigurăm că partenerii sunt salvați inițial în localStorage
 if (!getSavedPartners()) {
+  savePartnersToStorage();
+} else {
+  // Dacă partenerii există deja, actualizăm numărul de oferte
+  updatePartnerOfferCounts();
   savePartnersToStorage();
 }
 
@@ -46,6 +63,8 @@ export const getAllPartners = () => {
   const savedPartners = getSavedPartners();
   if (savedPartners) {
     partnerWebsites = savedPartners;
+    // Actualizăm numărul de oferte
+    updatePartnerOfferCounts();
   }
   return [...partnerWebsites];
 };
@@ -59,6 +78,8 @@ export const getAllActivePartners = () => {
   const savedPartners = getSavedPartners();
   if (savedPartners) {
     partnerWebsites = savedPartners;
+    // Actualizăm numărul de oferte
+    updatePartnerOfferCounts();
   }
   return [...partnerWebsites].filter(partner => partner.active);
 };
@@ -73,6 +94,8 @@ export const getPartnerById = (id) => {
   const savedPartners = getSavedPartners();
   if (savedPartners) {
     partnerWebsites = savedPartners;
+    // Actualizăm numărul de oferte
+    updatePartnerOfferCounts();
   }
   return partnerWebsites.find(partner => partner.id === parseInt(id));
 };
@@ -98,7 +121,7 @@ export const addPartner = (partnerData) => {
     ...partnerData,
     active: true,
     lastFetch: new Date().toISOString(),
-    offersCount: Math.floor(Math.random() * 30) + 5, // Random number of offers for demo
+    offersCount: 0, // Inițializăm cu 0, va fi actualizat corect la salvare
     logo: `https://via.placeholder.com/150x50?text=${partnerData.name.replace(/\s+/g, '')}`
   };
   

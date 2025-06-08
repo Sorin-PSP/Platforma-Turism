@@ -25,7 +25,11 @@ const saveOffersToStorage = () => {
   localStorage.setItem('offers', JSON.stringify(offers));
   
   // Declanșăm un eveniment pentru a notifica alte componente
-  window.dispatchEvent(new Event('offersUpdated'));
+  const event = new CustomEvent('offersUpdated', { detail: { offers: [...offers] } });
+  window.dispatchEvent(event);
+  
+  // Declanșăm și un eveniment de storage pentru a asigura sincronizarea
+  window.dispatchEvent(new Event('storage'));
 };
 
 /**
@@ -180,20 +184,53 @@ export const manualFetchOffers = async () => {
       
       // Generăm un număr aleatoriu de oferte noi (1-5)
       const newOffersCount = Math.floor(Math.random() * 5) + 1;
+      const removedCount = 0; // În simulare, nu ștergem oferte
+      
+      // Obținem toate agențiile active
+      const partners = JSON.parse(localStorage.getItem('partnerWebsites') || '[]');
+      const activePartners = partners.filter(p => p.active);
+      
+      if (activePartners.length === 0) {
+        resolve({
+          success: true,
+          message: 'Nu există agenții active pentru a actualiza ofertele.',
+          newOffersCount: 0,
+          removedCount: 0
+        });
+        return;
+      }
       
       // Adăugăm oferte noi bazate pe cele existente, dar cu ID-uri și prețuri diferite
       const highestId = Math.max(...offers.map(offer => offer.id), 0);
       
       for (let i = 0; i < newOffersCount; i++) {
-        // Alegem o ofertă aleatorie din cele existente ca bază
-        const baseOffer = offers[Math.floor(Math.random() * offers.length)];
+        // Alegem o agenție aleatorie din cele active
+        const randomPartner = activePartners[Math.floor(Math.random() * activePartners.length)];
         
-        // Creăm o nouă ofertă cu ID unic și preț diferit
+        // Creăm o ofertă nouă pentru această agenție
+        const baseOffer = offers.length > 0 
+          ? offers[Math.floor(Math.random() * offers.length)]
+          : {
+              destination: 'Destinație nouă',
+              location: 'Locație nouă, Țară',
+              price: 500,
+              oldPrice: 600,
+              duration: 7,
+              transport: 'Avion',
+              meals: 'All inclusive',
+              stars: 4,
+              image: 'https://source.unsplash.com/random/300x200/?travel',
+              description: 'O nouă ofertă turistică cu cazare și transport incluse.'
+            };
+        
         const newOffer = {
           ...baseOffer,
           id: highestId + i + 1,
-          price: Math.floor(baseOffer.price * (0.9 + Math.random() * 0.3)), // +/- 20% din prețul original
-          oldPrice: Math.floor(baseOffer.price * 1.2)
+          agency: randomPartner.name,
+          price: Math.floor(Math.random() * 500) + 300,
+          oldPrice: Math.floor(Math.random() * 300) + 600,
+          isNew: true,
+          isLastMinute: Math.random() > 0.7
         };
         
         offers.push(newOffer);
@@ -205,7 +242,8 @@ export const manualFetchOffers = async () => {
       resolve({
         success: true,
         message: `Ofertele au fost actualizate cu succes.`,
-        newOffersCount
+        newOffersCount,
+        removedCount
       });
     }, 1500); // Simulăm un delay de 1.5 secunde pentru a imita un apel API real
   });
@@ -213,14 +251,115 @@ export const manualFetchOffers = async () => {
 
 /**
  * Automatically checks for updates based on timer
- * @returns {boolean} - Whether automatic updates are enabled
+ * @returns {Promise} - Promise that resolves with the update result
  */
-export const autoCheckForUpdates = () => {
+export const autoCheckForUpdates = async () => {
   // Verificăm dacă actualizările automate sunt activate
   const autoUpdatesEnabled = localStorage.getItem('autoUpdatesEnabled');
   
   // Implicit, actualizările automate sunt activate
-  return autoUpdatesEnabled === null ? true : autoUpdatesEnabled === 'true';
+  if (autoUpdatesEnabled === null || autoUpdatesEnabled === 'true') {
+    // Simulăm un proces de actualizare automată
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Reîncărcăm din localStorage pentru a asigura date actualizate
+        const savedOffers = getSavedOffers();
+        if (savedOffers) {
+          offers = savedOffers;
+        }
+        
+        // Generăm un număr aleatoriu de oferte noi (0-3)
+        const newOffersCount = Math.floor(Math.random() * 4);
+        
+        // Generăm un număr aleatoriu de oferte eliminate (0-2)
+        const removedCount = Math.floor(Math.random() * 3);
+        
+        // Obținem toate agențiile active
+        const partners = JSON.parse(localStorage.getItem('partnerWebsites') || '[]');
+        const activePartners = partners.filter(p => p.active);
+        
+        if (activePartners.length === 0) {
+          resolve({
+            success: true,
+            message: 'Nu există agenții active pentru a actualiza ofertele.',
+            newOffersCount: 0,
+            removedCount: 0
+          });
+          return;
+        }
+        
+        // Adăugăm oferte noi
+        if (newOffersCount > 0) {
+          const highestId = Math.max(...offers.map(offer => offer.id), 0);
+          
+          for (let i = 0; i < newOffersCount; i++) {
+            // Alegem o agenție aleatorie din cele active
+            const randomPartner = activePartners[Math.floor(Math.random() * activePartners.length)];
+            
+            // Creăm o ofertă nouă pentru această agenție
+            const baseOffer = offers.length > 0 
+              ? offers[Math.floor(Math.random() * offers.length)]
+              : {
+                  destination: 'Destinație nouă',
+                  location: 'Locație nouă, Țară',
+                  price: 500,
+                  oldPrice: 600,
+                  duration: 7,
+                  transport: 'Avion',
+                  meals: 'All inclusive',
+                  stars: 4,
+                  image: 'https://source.unsplash.com/random/300x200/?travel',
+                  description: 'O nouă ofertă turistică cu cazare și transport incluse.'
+                };
+            
+            const newOffer = {
+              ...baseOffer,
+              id: highestId + i + 1,
+              agency: randomPartner.name,
+              price: Math.floor(Math.random() * 500) + 300,
+              oldPrice: Math.floor(Math.random() * 300) + 600,
+              isNew: true,
+              isLastMinute: Math.random() > 0.7
+            };
+            
+            offers.push(newOffer);
+          }
+        }
+        
+        // Eliminăm oferte expirate
+        if (removedCount > 0 && offers.length > removedCount) {
+          // Alegem aleatoriu oferte pentru a fi eliminate
+          const offerIdsToRemove = [];
+          for (let i = 0; i < removedCount; i++) {
+            const randomIndex = Math.floor(Math.random() * offers.length);
+            offerIdsToRemove.push(offers[randomIndex].id);
+          }
+          
+          offers = offers.filter(offer => !offerIdsToRemove.includes(offer.id));
+        }
+        
+        // Salvăm în localStorage
+        saveOffersToStorage();
+        
+        // Resetăm timer-ul pentru următoarea actualizare
+        resetUpdateTimer();
+        
+        resolve({
+          success: true,
+          message: `Actualizare automată completă.`,
+          newOffersCount,
+          removedCount
+        });
+      }, 2000); // Simulăm un delay de 2 secunde pentru a imita un proces de actualizare
+    });
+  } else {
+    return Promise.resolve({
+      success: false,
+      message: 'Actualizările automate sunt dezactivate.',
+      newOffersCount: 0,
+      removedCount: 0
+    });
+  }
 };
 
 /**
