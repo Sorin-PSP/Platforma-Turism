@@ -13,6 +13,7 @@ import AdminPartnersPage from './pages/AdminPartnersPage'
 import AdminOffersPage from './pages/AdminOffersPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import OfferUpdateStatus from './components/OfferUpdateStatus'
+import CookieBanner from './components/CookieBanner'
 
 function App() {
   return (
@@ -32,7 +33,8 @@ function App() {
               </Routes>
             </main>
             <Footer />
-            <OfferUpdateStatus />
+            <OfferUpdateStatus isAdminPanel={false} />
+            <CookieBanner />
           </>
         } />
 
