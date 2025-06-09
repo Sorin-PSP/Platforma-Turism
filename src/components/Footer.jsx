@@ -40,7 +40,7 @@ const Footer = () => {
               <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Acasă</Link></li>
               <li><Link to="/despre" className="text-gray-300 hover:text-white transition-colors">Despre noi</Link></li>
               <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Blog</a></li>
+              <li><Link to="/politici" className="text-gray-300 hover:text-white transition-colors">Politici și Termeni de utilizare</Link></li>
               <li>
                 <Link to="/admin/login" className="text-gray-300 hover:text-white transition-colors flex items-center">
                   <FaUser className="mr-1" />

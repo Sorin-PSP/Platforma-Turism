@@ -2,13 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaClock } from 'react-icons/fa';
 import { getNextUpdateTime, resetUpdateTimer } from '../services/offerService';
 
-// Adăugăm prop isAdminPanel pentru a controla vizibilitatea componentei
-const OfferUpdateStatus = ({ onUpdateNeeded, isAdminPanel = false }) => {
-  // Dacă nu suntem în panoul admin, nu afișăm nimic
-  if (!isAdminPanel) {
-    return null;
-  }
-  
+const OfferUpdateStatus = ({ onUpdateNeeded, showTimer = false }) => {
   const [timeRemaining, setTimeRemaining] = useState({
     minutes: 30,
     seconds: 0
@@ -103,6 +97,11 @@ const OfferUpdateStatus = ({ onUpdateNeeded, isAdminPanel = false }) => {
   // Formatăm timpul pentru afișare
   const formattedMinutes = timeRemaining.minutes.toString().padStart(2, '0');
   const formattedSeconds = timeRemaining.seconds.toString().padStart(2, '0');
+  
+  // Dacă showTimer este false, nu afișăm nimic
+  if (!showTimer) {
+    return null;
+  }
   
   return (
     <div className="flex items-center text-gray-600">

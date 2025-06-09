@@ -7,6 +7,7 @@ import OfferDetailsPage from './pages/OfferDetailsPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import LastMinutePage from './pages/LastMinutePage'
+import PoliciesPage from './pages/PoliciesPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminPartnersPage from './pages/AdminPartnersPage'
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/despre" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/last-minute" element={<LastMinutePage />} />
+                <Route path="/politici" element={<PoliciesPage />} />
               </Routes>
             </main>
             <Footer />

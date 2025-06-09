@@ -23,7 +23,8 @@ const HomePage = () => {
       <AgenciesList />
       <Testimonials />
       <Newsletter />
-      <OfferUpdateStatus />
+      {/* Cronometrul este ascuns în pagina principală */}
+      <OfferUpdateStatus showTimer={false} />
     </div>
   )
 }

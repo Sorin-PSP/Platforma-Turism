@@ -231,7 +231,7 @@ const AdminDashboardPage = () => {
             <div>
               <div className="text-sm font-medium text-gray-500">Următoarea Actualizare</div>
               <div className="text-2xl font-semibold">
-                <OfferUpdateStatus onUpdateNeeded={handleAutoUpdate} />
+                <OfferUpdateStatus onUpdateNeeded={handleAutoUpdate} showTimer={true} />
               </div>
             </div>
           </div>
